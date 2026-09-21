@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>尾牙活動組 進度板</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#B4261F; --red-dk:#8E1A15; --gold:#E8B33B; --cream:#FBF6EA; --paper:#FFFFFF;
+    --ink:#2B2320; --ink-2:#6B5E56; --ink-3:#9C8F86; --line:#EADFCB; --line-2:#F3ECDD;
+    --s-none:#B8B0A6; --s-doing:#3A6B8C; --s-done:#3F7A5A; --s-late:#C0392B;
+    --font:"Noto Sans TC","Microsoft JhengHei","微軟正黑體","PingFang TC",sans-serif;
+    --display:"Noto Serif TC","Noto Sans TC","Microsoft JhengHei",serif;
+    --shadow:0 2px 12px rgba(80,50,20,.08);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--cream);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:var(--display);margin:0;font-weight:700;letter-spacing:.02em}
+  button,select,input,textarea{font:inherit;color:inherit}
+  a{color:var(--red)}
+
+  /* ── 頁首 ── */
+  header{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.2);position:sticky;top:0;z-index:20}
+  header .in{max-width:1200px;margin:0 auto;padding:14px 20px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header h1{font-size:24px}
+  header .sub{font-size:13px;opacity:.85;margin-top:2px}
+  header .sp{flex:1}
+  .badge{font-size:12.5px;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);white-space:nowrap}
+  .badge.demo{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+  .me{display:flex;align-items:center;gap:8px;font-size:13.5px;white-space:nowrap}
+  .me input{width:130px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.6);background:#fff;color:var(--ink)}
+  .btn{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
+  .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
+  .btn.ghost:hover{background:rgba(255,255,255,.12)}
+  .btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
+  nav.tabs{max-width:1200px;margin:10px auto 0;padding:0 20px;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs::-webkit-scrollbar{display:none}
+  nav.tabs button{background:transparent;border:0;color:rgba(255,255,255,.85);padding:10px 18px;font-size:15px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+  nav.tabs button:hover{color:#fff}
+  nav.tabs button.on{color:#fff;border-bottom-color:var(--gold);font-weight:500}
+
+  /* ── 主體 ── */
+  main{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+  .page{display:none}.page.on{display:block}
+  .notice{background:#FFF6D6;border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:14px;margin-bottom:20px;display:none}
+  .notice.on{display:block}
+  .sec-h{display:flex;align-items:baseline;gap:14px;margin:8px 0 16px;flex-wrap:wrap}
+  .sec-h h2{font-size:22px;color:var(--red-dk)}
+  .sec-h .hint{font-size:13px;color:var(--ink-2)}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+  /* 總覽 */
+  .tiles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:24px}
+  .tile{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+  .tile b{display:block;font-size:34px;font-family:var(--display);line-height:1.1;color:var(--red)}
+  .tile span{font-size:13px;color:var(--ink-2)}
+  .tile .bar{height:8px;background:var(--line-2);border-radius:99px;margin-top:10px;overflow:hidden}
+  .tile .bar i{display:block;height:100%;background:var(--s-done);border-radius:99px;transition:width .4s}
+  .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-family:var(--display);font-size:17px;color:var(--red-dk)}
+  .card .bd{padding:8px 18px 14px}
+  .rlist{list-style:none;margin:0;padding:0}
+  .rlist li{display:grid;grid-template-columns:120px 1fr 48px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line-2);font-size:14px}
+  .rlist li:last-child{border-bottom:0}
+  .rlist .bar{height:8px;background:var(--line-2);border-radius:99px;overflow:hidden}
+  .rlist .bar i{display:block;height:100%;background:var(--s-done);border-radius:99px}
+  .rlist .pct{text-align:right;font-weight:500}
+  .dlist{list-style:none;margin:0;padding:0}
+  .dlist li{padding:9px 0;border-bottom:1px solid var(--line-2);font-size:14px;display:flex;gap:10px;align-items:baseline}
+  .dlist li:last-child{border-bottom:0}
+  .dlist .id{font-weight:700;color:var(--red);white-space:nowrap}
+  .dlist .when{margin-left:auto;font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+  .dlist .when.late{color:var(--s-late);font-weight:500}
+  .empty{color:var(--ink-3);font-size:14px;padding:10px 0}
+
+  /* 分工比例 */
+  .roles{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .role{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .role .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .role .top b{font-family:var(--display);font-size:20px;color:var(--red-dk)}
+  .role .top em{font-style:normal;font-size:32px;font-family:var(--display);color:var(--red);line-height:1}
+  .role .meta{font-size:13.5px;color:var(--ink-2);margin:6px 0 12px}
+  .role .bar{height:12px;background:var(--line-2);border-radius:99px;overflow:hidden;position:relative}
+  .role .bar i{position:absolute;left:0;top:0;height:100%;border-radius:99px}
+  .role .bar i.load{background:var(--gold)}
+  .role .bar i.done{background:var(--s-done)}
+  .role .legend{display:flex;gap:14px;font-size:12.5px;color:var(--ink-2);margin-top:8px}
+  .role .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .role .who{font-size:14px;margin:12px 0 10px;padding-top:10px;border-top:1px dashed var(--line)}
+  .role .who span.na{color:var(--ink-3)}
+  .role .duty{font-size:13.5px;color:var(--ink-2)}
+  .role .duty small{display:block;color:var(--ink-3);margin-top:6px;font-size:12.5px}
+  .role .go{margin-top:12px}
+  .role .go button{font-size:13px;padding:5px 12px}
+
+  /* 篩選 */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+  .chip{padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13.5px}
+  .chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+  .filters .sp{flex:1}
+  .filters label{font-size:13.5px;display:flex;gap:6px;align-items:center;cursor:pointer}
+
+  /* 填進度 */
+  .twrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:14px;min-width:1040px}
+  th,td{padding:14px 14px;border-bottom:1px solid var(--line-2);vertical-align:top;text-align:left}
+  th{background:#FBF1E4;color:var(--red-dk);white-space:nowrap;font-weight:500;position:sticky;top:0;z-index:1}
+  tr:last-child td{border-bottom:none}
+  tr.late td{background:#FFF5F3}
+  tr.done td{color:#8a8078}
+  td.id{font-weight:700;white-space:nowrap;color:var(--red)}
+  td .name{font-weight:500;font-size:15px}
+  td .detail{font-size:13px;color:var(--ink-2);margin-top:4px;line-height:1.6}
+  td .more{font-size:12.5px;color:var(--ink-3);margin-top:4px;display:none}
+  .showmore td .more{display:block}
+  .load{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12.5px;white-space:nowrap}
+  .load.高{background:#F6C6A6}.load.中{background:#FFE9A8}.load.低{background:#DDEFD9}
+  td .hours{font-size:12.5px;color:var(--ink-2);display:block;margin-top:6px;line-height:1.5}
+  td .dates{white-space:nowrap;font-weight:500}
+  td .left{font-size:12.5px;display:block;margin-top:4px;color:var(--ink-2)}
+  td .left.warn{color:var(--s-late);font-weight:500}
+  select.status{padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:500}
+  select.status.未開始{color:var(--ink-2)}
+  select.status.進行中{border-color:var(--s-doing);color:var(--s-doing)}
+  select.status.已完成{border-color:var(--s-done);color:var(--s-done)}
+  select.status.延遲{border-color:var(--s-late);color:var(--s-late)}
+  input.pct{width:70px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);text-align:right}
+  textarea.note{width:200px;min-height:40px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);resize:vertical;line-height:1.5}
+  td .by{font-size:12.5px;color:var(--ink-2);white-space:nowrap;line-height:1.5}
+  td .msg{font-size:12.5px;margin-top:4px}
+  .saving{color:var(--s-doing)}.saved{color:var(--s-done)}.err{color:var(--s-late)}
+
+  /* 時程 */
+  .gwrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px 18px;box-shadow:var(--shadow)}
+  .gantt{min-width:960px;position:relative}
+  .g-months{height:26px;font-size:12.5px;color:var(--ink-2);border-bottom:1px solid var(--line);position:relative;margin-left:190px}
+  .g-months span{position:absolute;top:3px;border-left:1px solid var(--line);padding-left:6px;height:22px}
+  .g-body{position:relative}
+  .g-row{display:flex;align-items:center;height:32px}
+  .g-row .lab{width:190px;flex:none;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px}
+  .g-row .lab b{color:var(--red);margin-right:4px}
+  .g-row .track{flex:1;height:16px;position:relative;background:var(--line-2);border-radius:4px}
+  .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:var(--s-none)}
+  .g-row .bar.進行中{background:var(--s-doing)}.g-row .bar.已完成{background:var(--s-done)}.g-row .bar.延遲{background:var(--s-late)}
+  .g-row .bar i{position:absolute;left:0;top:0;height:100%;background:rgba(255,255,255,.5);border-radius:4px 0 0 4px}
+  .g-today{position:absolute;top:0;bottom:0;border-left:2px dashed var(--red);pointer-events:none}
+  .g-today:after{content:"今天";position:absolute;top:-22px;left:4px;font-size:11px;color:var(--red);white-space:nowrap}
+  .g-legend{display:flex;gap:16px;font-size:13px;color:var(--ink-2);margin-top:12px;flex-wrap:wrap}
+  .g-legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+  /* 設定 */
+  dialog{border:1px solid var(--line);border-radius:14px;padding:24px;max-width:560px;width:92vw;font-family:var(--font)}
+  dialog::backdrop{background:rgba(40,20,10,.35)}
+  dialog h2{font-size:20px;color:var(--red-dk);margin-bottom:8px}
+  dialog input[type=url]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px}
+  dialog .row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+  dialog p{font-size:13.5px;color:var(--ink-2)}
+  footer{text-align:center;font-size:12.5px;color:var(--ink-3);padding:24px}
+  @media (max-width:640px){header h1{font-size:20px}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="in">
+    <div><h1>尾牙活動組 進度板</h1><div class="sub">台味新樂園 · 活動日 2027/1/29 · 資料更新 <span id="upd">—</span></div></div>
+    <span class="sp"></span>
+    <span class="badge" id="mode">連線中…</span>
+    <label class="me">我是 <input id="me" placeholder="填你的名字" maxlength="12"></label>
+    <button class="btn ghost" id="reload">重新整理</button>
+    <button class="btn ghost" id="cfg">設定</button>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button class="on" data-page="overview">總覽</button>
+    <button data-page="roles">分工比例</button>
+    <button data-page="tasks">填進度</button>
+    <button data-page="timeline">時程</button>
+  </nav>
+</header>
+
+<main>
+  <div class="notice" id="notice"></div>
+
+  <!-- 總覽 -->
+  <section class="page on" id="page-overview">
+    <div class="tiles">
+      <div class="tile"><b id="t-pct">0%</b><span>整體完成率（依人天加權）</span><div class="bar"><i id="t-bar"></i></div></div>
+      <div class="tile"><b id="t-done">0</b><span>已完成 / <span id="t-total">26</span> 項</span></div>
+      <div class="tile"><b id="t-doing">0</b><span>進行中</span></div>
+      <div class="tile"><b id="t-week">0</b><span>本週到期</span></div>
+      <div class="tile"><b id="t-late" style="color:var(--s-late)">0</b><span>逾期未完成</span></div>
+      <div class="tile"><b id="t-days">—</b><span>距活動日</span></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="hd">各位子完成率</div><div class="bd"><ul class="rlist" id="ov-roles"></ul></div></div>
+      <div class="card"><div class="hd">最近要到期</div><div class="bd"><ul class="dlist" id="ov-due"></ul></div></div>
+      <div class="card"><div class="hd">進行中</div><div class="bd"><ul class="dlist" id="ov-doing"></ul></div></div>
+      <div class="card"><div class="hd">最近更新</div><div class="bd"><ul class="dlist" id="ov-recent"></ul></div></div>
+    </div>
+  </section>
+
+  <!-- 分工比例 -->
+  <section class="page" id="page-roles">
+    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的人天 ÷ 全組總人天；黃條是負荷、綠條是該位子項目的完成率</span></div>
+    <div class="roles" id="roles"></div>
+  </section>
+
+  <!-- 填進度 -->
+  <section class="page" id="page-tasks">
+    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改狀態、完成％或備註後會自動存檔</span></div>
+    <div class="filters" id="filters">
+      <button class="chip on" data-role="">全部</button>
+      <span class="sp"></span>
+      <label><input type="checkbox" id="showMore"> 顯示產出與前置</label>
+      <label><input type="checkbox" id="hideDone"> 隱藏已完成</label>
+    </div>
+    <div class="twrap"><table id="taskTable">
+      <thead><tr>
+        <th>編號</th><th>工作項目</th><th>負責</th><th>工作量</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </section>
+
+  <!-- 時程 -->
+  <section class="page" id="page-timeline">
+    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；條內淺色是完成％</span></div>
+    <div class="filters" id="filters2"><button class="chip on" data-role="">全部</button><span class="sp"></span></div>
+    <div class="gwrap"><div class="gantt" id="gantt"></div>
+      <div class="g-legend"><span><i style="background:var(--s-none)"></i>未開始</span><span><i style="background:var(--s-doing)"></i>進行中</span><span><i style="background:var(--s-done)"></i>已完成</span><span><i style="background:var(--s-late)"></i>延遲</span></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="dlg">
+  <h2>連線設定</h2>
+  <p>貼上 Google Apps Script 部署後的網頁應用程式網址（以 /exec 結尾）。留空則為展示模式，填寫只存在這台電腦。</p>
+  <input type="url" id="gasUrl" placeholder="https://script.google.com/macros/s/…/exec">
+  <div class="row"><button class="btn" id="dlgCancel">取消</button><button class="btn primary" id="dlgSave">儲存並重新載入</button></div>
+</dialog>
+
+<footer>2027 尾牙活動組 進度板 · 資料來源：活動組工作甘特圖「進度資料」分頁</footer>
+
+<script>
+// ── 預設 GAS 網址（可用右上角「設定」覆寫） ──
+var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbz05Z9JAW6zQRK_vkA1QUzmGkbI1MLG2WuxVPM_RCENx7nGE7-bJTMKIUWjoPNSjpYiZw/exec";
+// ── 展示模式用的初始資料（由 xlsx 匯出） ──
+var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認主責、協辦、代理人、回報頻率與文件存放位置","output":"活動組工作分配表","role":"統籌","person":"","days":1,"load":"低","hours":"共 8 h，每人約 8 h（4 天內）","start":"2026-09-22","end":"2026-09-25","pre":"—","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A02","name":"建立活動組工作清單","detail":"將活動組職掌拆成流程、遊戲、主持、場控及文件等工作包","output":"工作分解表（WBS）","role":"統籌","person":"","days":1,"load":"低","hours":"共 8 h，每人每週約 7 h","start":"2026-09-22","end":"2026-09-29","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A03","name":"蒐集歷年尾牙資料","detail":"整理歷年活動流程、遊戲、主持稿、場控表及問題紀錄","output":"歷年資料彙整表","role":"全組","person":"","days":2,"load":"低","hours":"共 16 h，每人約 3 h（5 天內）","start":"2026-09-28","end":"2026-10-02","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A04","name":"確認活動需求與限制","detail":"確認參加人數、活動長度、長官致詞、頒獎、抽獎及場地限制","output":"需求與限制清單","role":"統籌","person":"","days":2,"load":"低","hours":"共 16 h，每人每週約 11 h","start":"2026-09-28","end":"2026-10-07","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A05","name":"確認活動目標與主題方向","detail":"依企劃組方向轉化為活動氣氛、互動原則與舞台概念","output":"活動主軸說明","role":"統籌","person":"","days":2,"load":"低","hours":"共 16 h，每人每週約 12 h","start":"2026-10-01","end":"2026-10-09","pre":"A04","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A06","name":"規劃活動整體架構","detail":"安排開場、致詞、用餐、頒獎、互動、抽獎及閉幕段落","output":"活動架構圖","role":"統籌","person":"","days":3,"load":"中","hours":"共 24 h，每人每週約 17 h","start":"2026-10-05","end":"2026-10-14","pre":"A04,A05","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A07","name":"提出互動活動方案","detail":"提出至少2套遊戲或互動方案，包含規則、時間、人力及風險","output":"活動方案提案","role":"戶外活動內容、餐會活動內容","person":"","days":8,"load":"高","hours":"共 64 h，每人每週約 14 h","start":"2026-10-08","end":"2026-10-23","pre":"A05,A06","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A08","name":"設計遊戲規則與計分方式","detail":"完成參加方式、分組、計分、勝負判定及公平性檢核","output":"遊戲規則文件","role":"戶外活動內容、餐會活動內容","person":"","days":6,"load":"高","hours":"共 48 h，每人每週約 10 h","start":"2026-10-15","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A09","name":"規劃獎項與抽獎流程","detail":"確認遊戲獎項、抽獎銜接、領獎方式及備用方案","output":"獎項與抽獎流程表","role":"餐會活動內容","person":"","days":3,"load":"中","hours":"共 24 h，每人每週約 7 h","start":"2026-10-19","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A10","name":"製作活動流程初稿","detail":"將各段落整合為含時間、內容、窗口及設備需求的流程表","output":"活動流程初稿","role":"統籌＋內容","person":"","days":3,"load":"中","hours":"共 24 h，每人每週約 5 h","start":"2026-10-26","end":"2026-11-06","pre":"A06,A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A11","name":"盤點跨組協作需求","detail":"彙整設計、採購、場佈音效、影像及行政所需配合事項","output":"跨組需求清單","role":"戶外活動執行、餐會活動執行","person":"","days":3,"load":"中","hours":"共 24 h，每人每週約 8 h","start":"2026-11-02","end":"2026-11-11","pre":"A10","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A12","name":"確認場地流程與動線","detail":"依場地平面、舞台、餐桌及設備位置調整進退場與活動動線","output":"場地動線需求表","role":"戶外活動執行、餐會活動執行","person":"","days":5,"load":"高","hours":"共 40 h，每人每週約 11 h","start":"2026-11-05","end":"2026-11-17","pre":"A10,A11","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A13","name":"活動方案審查與定案","detail":"確認最終流程、遊戲、獎項、時間及備案","output":"活動方案定案紀錄","role":"統籌","person":"","days":1,"load":"低","hours":"共 8 h，每人約 8 h（5 天內）","start":"2026-11-16","end":"2026-11-20","pre":"A10,A11,A12","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A14","name":"確認主持人配置","detail":"確認主持人、代班人選、主持分工及溝通方式","output":"主持人確認表","role":"統籌","person":"","days":1,"load":"低","hours":"共 8 h，每人每週約 6 h","start":"2026-11-23","end":"2026-12-02","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A15","name":"撰寫開場與串場稿","detail":"完成開場、長官介紹、流程轉場及氣氛帶動稿","output":"主持稿第一版","role":"戶外活動內容、餐會活動內容","person":"","days":4,"load":"中","hours":"共 32 h，每人每週約 7 h","start":"2026-11-26","end":"2026-12-11","pre":"A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A16","name":"撰寫頒獎與抽獎稿","detail":"完成頒獎名單銜接、抽獎規則、得獎宣告及領獎提醒","output":"頒獎抽獎稿","role":"餐會活動內容","person":"","days":3,"load":"中","hours":"共 24 h，每人每週約 11 h","start":"2026-12-01","end":"2026-12-15","pre":"A09,A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A17","name":"建立工作人員執行表","detail":"列出各時段工作、集合時間、站位、聯絡方式及交接事項","output":"工作人員執行表","role":"戶外活動執行、餐會活動執行","person":"","days":4,"load":"中","hours":"共 32 h，每人每週約 8 h","start":"2026-12-03","end":"2026-12-16","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A18","name":"建立場控Cue表","detail":"列出音樂、影片、燈光、主持、道具及工作人員Cue點","output":"場控Cue表","role":"統籌＋執行","person":"","days":4,"load":"中","hours":"共 32 h，每人每週約 5 h","start":"2026-12-10","end":"2026-12-24","pre":"A15,A16,A17","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A19","name":"建立道具與備品清單","detail":"列出遊戲道具、獎品、抽獎用品、文具及備品數量","output":"道具備品清單","role":"戶外活動執行、餐會活動執行","person":"","days":4,"load":"中","hours":"共 32 h，每人每週約 7 h","start":"2026-12-10","end":"2026-12-24","pre":"A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A20","name":"完成跨組文件確認","detail":"與設計、採購、場佈音效、影像組確認版本及交付期限","output":"跨組確認紀錄","role":"統籌","person":"","days":2,"load":"低","hours":"共 16 h，每人每週約 11 h","start":"2026-12-21","end":"2026-12-30","pre":"A11,A18,A19","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A21","name":"第一次流程演練","detail":"以桌上推演檢查流程長度、轉場、規則及人力缺口","output":"流程演練紀錄","role":"全組","person":"","days":3,"load":"中","hours":"共 24 h，每人約 5 h（5 天內）","start":"2027-01-04","end":"2027-01-08","pre":"A18,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A22","name":"修正流程與主持稿","detail":"依演練結果修訂時間、台詞、Cue點及備案","output":"流程與主持稿第二版","role":"統籌＋內容","person":"","days":3,"load":"中","hours":"共 24 h，每人約 8 h（5 天內）","start":"2027-01-11","end":"2027-01-15","pre":"A21","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A23","name":"確認活動前物資到位","detail":"檢查道具、獎品、文件及備品數量與存放位置","output":"物資檢查表","role":"戶外活動執行、餐會活動執行","person":"","days":3,"load":"中","hours":"共 24 h，每人約 12 h（5 天內）","start":"2027-01-18","end":"2027-01-22","pre":"A19,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A24","name":"總彩排與最終確認","detail":"完整走台、主持、遊戲、頒獎、抽獎及技術銜接","output":"總彩排紀錄、最終版Run Down","role":"全組","person":"","days":5,"load":"高","hours":"共 40 h，每人約 8 h（3 天內）","start":"2027-01-25","end":"2027-01-27","pre":"A22,A23","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A25","name":"活動當日執行","detail":"完成現場場控、流程控制、道具調度、臨場應變及收尾","output":"活動執行紀錄","role":"全組","person":"","days":5,"load":"高","hours":"共 40 h，每人約 8 h（當日）","start":"2027-01-29","end":"2027-01-29","pre":"A24","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A26","name":"活動後檢討與結案","detail":"彙整問題、建議、照片影片交接及文件歸檔","output":"檢討報告、結案資料","role":"統籌","person":"","days":2,"load":"低","hours":"共 16 h，每人約 16 h（7 天內）","start":"2027-01-30","end":"2027-02-05","pre":"A25","status":"未開始","pct":0,"note":"","by":"","at":""}],"roles":[{"role":"統籌","ratio":0.26,"days":21,"hours":171,"weekly":9,"duty":"活動整體架構與方案定案；進度管理與甘特圖維護；備案（含天候）決策；主持人配置；各段落講稿與場控Cue表整合；跨組文件版本確認；代表活動組進籌備會；活動當日總場控","note":"協辦：全組｜代理人：戶外活動執行｜甘特圖 A01–A06、A10、A13、A14、A18、A20–A22、A24–A26"},{"role":"戶外活動 內容","ratio":0.19,"days":16,"hours":124,"weekly":7,"duty":"戶外活動的遊戲設計、規則、分組與計分方式；戶外段落主持稿與流程表；備案版本的內容調整","note":"協辦／代理人：戶外活動執行｜甘特圖 A07、A08、A15（戶外段）、A22"},{"role":"戶外活動 執行","ratio":0.17,"days":14,"hours":111,"weekly":6,"duty":"場地窗口與預約；場勘與動線；工作人員招募、說明與執行表；戶外段落道具備品清單；當日戶外現場場控","note":"協辦／代理人：戶外活動內容｜甘特圖 A11、A12、A17、A19、A23（戶外段）"},{"role":"餐會活動 內容","ratio":0.22,"days":18,"hours":148,"weekly":8,"duty":"餐會流程、互動遊戲設計與規則；獎項與抽獎流程；餐會段落主持稿（開場、串場、頒獎、抽獎）","note":"協辦／代理人：餐會活動執行｜甘特圖 A07、A09、A15、A16（餐會段）、A22"},{"role":"餐會活動 執行","ratio":0.16,"days":14,"hours":111,"weekly":6,"duty":"餐會場地需求與動線；與採購、場佈音效、設計、影像組的協作需求彙整；餐會段落Cue表與道具備品清單；當日餐會現場場控","note":"協辦／代理人：餐會活動內容｜甘特圖 A11、A12、A18、A19、A23（餐會段）"}]};
+
+(function(){
+  var KEY = 'weiya2027_progress_';
+  function ls(k, v){ try{ if(v===undefined) return localStorage.getItem(KEY+k); localStorage.setItem(KEY+k, v); }catch(e){ return null; } }
+  var stored = ls('gas');
+  var GAS = ((stored === null || stored === undefined) ? DEFAULT_GAS_URL : stored).trim();
+  var demo = !GAS;
+  var state = { tasks: [], roles: [], serverTime: '' };
+  var filterRole = '', hideDone = false, showMore = false;
+  var EVENT = new Date(2027, 0, 29), T0 = new Date(2026, 8, 22), T1 = new Date(2027, 1, 6);
+  var $ = function(id){ return document.getElementById(id); };
+  var meInput = $('me'); meInput.value = ls('me') || '';
+  meInput.addEventListener('change', function(){ ls('me', meInput.value.trim()); });
+
+  // ── 日期：後台可能回 yyyy-MM-dd 或 JS Date 字串，一律轉成本地日期 ──
+  function toDate(s){
+    if(s instanceof Date) return new Date(s.getFullYear(), s.getMonth(), s.getDate());
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(String(s||''));
+    if(m) return new Date(+m[1], +m[2]-1, +m[3]);
+    var x = new Date(s); return isNaN(x) ? null : new Date(x.getFullYear(), x.getMonth(), x.getDate());
+  }
+  function normTask(t){
+    var s = toDate(t.start), e = toDate(t.end);
+    t.startD = s; t.endD = e;
+    t.days = Number(t.days)||0; t.pct = Number(t.pct)||0;
+    t.status = t.status || '未開始';
+    return t;
+  }
+  function today(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function fmt(x){ return x ? (x.getMonth()+1)+'/'+x.getDate() : '—'; }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+  // ── 資料層 ──
+  function jsonp(params){
+    return new Promise(function(resolve, reject){
+      var cb = 'cb' + Date.now() + Math.floor(Math.random()*1e5);
+      var s = document.createElement('script');
+      var q = Object.keys(params).map(function(k){ return encodeURIComponent(k)+'='+encodeURIComponent(params[k]); }).join('&');
+      var timer = setTimeout(function(){ cleanup(); reject(new Error('連線逾時')); }, 25000);
+      function cleanup(){ clearTimeout(timer); delete window[cb]; s.remove(); }
+      window[cb] = function(data){ cleanup(); data && data.ok ? resolve(data) : reject(new Error(data && data.error || '後台回傳錯誤')); };
+      s.onerror = function(){ cleanup(); reject(new Error('無法連到試算表後台')); };
+      s.src = GAS + (GAS.indexOf('?')>0?'&':'?') + q + '&callback=' + cb;
+      document.head.appendChild(s);
+    });
+  }
+  function loadLocal(){
+    var saved = null; try{ saved = JSON.parse(ls('demo') || 'null'); }catch(e){}
+    var base = JSON.parse(JSON.stringify(SEED));
+    if(saved){ base.tasks.forEach(function(t){ if(saved[t.id]) Object.assign(t, saved[t.id]); }); }
+    return Promise.resolve({ ok:true, tasks: base.tasks, roles: base.roles, serverTime: '展示模式' });
+  }
+  function saveLocal(t){
+    var saved = {}; try{ saved = JSON.parse(ls('demo') || '{}'); }catch(e){}
+    saved[t.id] = { status:t.status, pct:t.pct, note:t.note, by:t.by, at:t.at };
+    ls('demo', JSON.stringify(saved));
+    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+  }
+  function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
+  function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, by:t.by }); }
+
+  // ── 計算 ──
+  function effPct(t){ return t.status==='已完成' ? 100 : Math.max(0, Math.min(100, t.pct)); }
+  function isLate(t){ return t.status!=='已完成' && t.endD && t.endD < today(); }
+  function roleKeys(t){ return String(t.role||'').replace(/＋/g,'、').split(/[、,]/).map(function(x){return x.replace(/\s/g,'');}).filter(Boolean); }
+  function roleMatch(t, role){
+    var ks = roleKeys(t), r = role.replace(/\s/g,'');
+    if(ks.indexOf('全組')>=0) return true;
+    return ks.some(function(k){ return k===r || (k==='內容' && /內容$/.test(r)) || (k==='執行' && /執行$/.test(r)); });
+  }
+  function shareWeight(t){ var ks = roleKeys(t); return t.days / Math.max(1, ks.indexOf('全組')>=0 ? 5 : ks.length); }
+  function rolePct(role){
+    var sumD=0, sumDone=0;
+    state.tasks.forEach(function(t){ if(!roleMatch(t, role)) return; var w=shareWeight(t); sumD+=w; sumDone+=w*effPct(t)/100; });
+    return sumD ? Math.round(sumDone/sumD*100) : 0;
+  }
+  function leftText(t){
+    if(t.status==='已完成' || !t.endD) return '';
+    var n = Math.round((t.endD - today())/86400000);
+    return n<0 ? '逾期 '+(-n)+' 天' : (n===0 ? '今天到期' : '剩 '+n+' 天');
+  }
+
+  // ── 總覽 ──
+  function renderOverview(){
+    var ts = state.tasks, sumD=0, sumDone=0, done=0, doing=0, late=0, week=0;
+    var t0 = today(), dow=(t0.getDay()+6)%7, wS=new Date(t0); wS.setDate(t0.getDate()-dow); var wE=new Date(wS); wE.setDate(wS.getDate()+6);
+    ts.forEach(function(t){
+      sumD+=t.days; sumDone+=t.days*effPct(t)/100;
+      if(t.status==='已完成') done++; else if(t.status==='進行中') doing++;
+      if(isLate(t)) late++;
+      if(t.status!=='已完成' && t.endD && t.endD>=wS && t.endD<=wE) week++;
+    });
+    var pct = sumD ? Math.round(sumDone/sumD*100) : 0;
+    $('t-pct').textContent = pct+'%'; $('t-bar').style.width = pct+'%';
+    $('t-done').textContent = done; $('t-total').textContent = ts.length; $('t-doing').textContent = doing;
+    $('t-week').textContent = week; $('t-late').textContent = late;
+    var left = Math.round((EVENT - t0)/86400000); $('t-days').textContent = left>0 ? left+' 天' : (left===0 ? '今天' : '已結束');
+
+    $('ov-roles').innerHTML = state.roles.map(function(r){ var p=rolePct(r.role); return '<li><span>'+esc(r.role)+'</span><div class="bar"><i style="width:'+p+'%"></i></div><span class="pct">'+p+'%</span></li>'; }).join('') || '<li class="empty">—</li>';
+
+    var due = ts.filter(function(t){ return t.status!=='已完成' && t.endD; }).sort(function(a,b){ return a.endD-b.endD; }).slice(0,6);
+    $('ov-due').innerHTML = due.map(function(t){ var l=isLate(t); return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+'</span><span class="when '+(l?'late':'')+'">'+fmt(t.endD)+' · '+esc(leftText(t))+'</span></li>'; }).join('') || '<li class="empty">全部完成</li>';
+
+    var dg = ts.filter(function(t){ return t.status==='進行中'; });
+    $('ov-doing').innerHTML = dg.map(function(t){ return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+(t.person?' · '+esc(t.person):'')+'</span><span class="when">'+effPct(t)+'%</span></li>'; }).join('') || '<li class="empty">目前沒有進行中的項目</li>';
+
+    var rc = ts.filter(function(t){ return t.at; }).sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); }).slice(0,6);
+    $('ov-recent').innerHTML = rc.map(function(t){ return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+' → '+esc(t.status)+' '+effPct(t)+'%</span><span class="when">'+esc(t.by)+' '+esc(String(t.at).slice(5,16))+'</span></li>'; }).join('') || '<li class="empty">還沒有人更新</li>';
+  }
+
+  // ── 分工比例 ──
+  function renderRoles(){
+    var box = $('roles'); box.innerHTML='';
+    var maxRatio = Math.max.apply(null, state.roles.map(function(r){ return r.ratio||0; }).concat([0.3]));
+    ['filters','filters2'].forEach(function(fid){
+      var f = $(fid); f.querySelectorAll('.chip[data-role]:not([data-role=""])').forEach(function(c){ c.remove(); });
+      var sp = f.querySelector('.sp');
+      state.roles.forEach(function(r){ var c=document.createElement('button'); c.className='chip'; c.dataset.role=r.role; c.textContent=r.role; f.insertBefore(c, sp); });
+    });
+    state.roles.forEach(function(r){
+      var mine = state.tasks.filter(function(t){ return roleMatch(t, r.role); });
+      var pct = rolePct(r.role);
+      var people={}; mine.forEach(function(t){ if(t.person) String(t.person).split(/[、,\s]+/).forEach(function(p){ if(p) people[p]=1; }); });
+      var loadW = Math.round(r.ratio/maxRatio*100);
+      var el = document.createElement('div'); el.className='role';
+      el.innerHTML = '<div class="top"><b>'+esc(r.role)+'</b><em>'+Math.round(r.ratio*100)+'%</em></div>'
+        + '<div class="meta">約 '+r.days+' 人天 · '+r.hours+' 小時 · 平均每週約 '+r.weekly+' 小時 · '+mine.length+' 項工作</div>'
+        + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
+        + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--s-done)"></i>完成 '+pct+'%</span></div>'
+        + '<div class="who">負責人：'+(Object.keys(people).length ? esc(Object.keys(people).join('、')) : '<span class="na">待填</span>')+'</div>'
+        + '<div class="duty">'+esc(r.duty||'')+'<small>'+esc(r.note||'')+'</small></div>'
+        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>';
+      box.appendChild(el);
+    });
+  }
+
+  // ── 填進度 ──
+  function renderRows(){
+    var tb = $('rows'); tb.innerHTML='';
+    $('taskTable').classList.toggle('showmore', showMore);
+    state.tasks.forEach(function(t){
+      if(filterRole && !roleMatch(t, filterRole)) return;
+      if(hideDone && t.status==='已完成') return;
+      var late = isLate(t);
+      var tr = document.createElement('tr'); tr.className = (late?'late ':'')+(t.status==='已完成'?'done':'');
+      tr.innerHTML =
+        '<td class="id">'+esc(t.id)+'</td>'
+        + '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+(t.pre&&t.pre!=='—'?'　前置：'+esc(t.pre):'')+'</div></td>'
+        + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
+        + '<td><span class="load '+esc(t.load)+'">'+t.days+' 人天 · '+esc(t.load)+'</span><span class="hours">'+esc(t.hours||'')+'</span></td>'
+        + '<td><span class="dates">'+fmt(t.startD)+' → '+fmt(t.endD)+'</span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
+        + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成','延遲'].map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
+        + '<td><input class="pct" type="number" min="0" max="100" step="5" value="'+effPct(t)+'"></td>'
+        + '<td><textarea class="note" placeholder="備註…">'+esc(t.note||'')+'</textarea></td>'
+        + '<td><div class="by">'+(t.by ? esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16)) : '—')+'</div><div class="msg"></div></td>';
+      var sel=tr.querySelector('select'), pct=tr.querySelector('input.pct'), note=tr.querySelector('textarea'), msg=tr.querySelector('.msg');
+      function commit(){
+        var me=(meInput.value||'').trim();
+        if(!me){ meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
+        t.status=sel.value; t.pct=Number(pct.value)||0; t.note=note.value;
+        if(t.status==='已完成'){ t.pct=100; pct.value=100; }
+        else if(t.status==='未開始' && t.pct>0){ t.status='進行中'; sel.value='進行中'; }
+        t.by=me; var n=new Date(); t.at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
+        sel.className='status '+t.status;
+        msg.innerHTML='<span class="saving">儲存中…</span>';
+        pushUpdate(t).then(function(res){
+          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          state.serverTime = res.serverTime || state.serverTime;
+          renderAll();
+        }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
+      }
+      sel.addEventListener('change', commit);
+      pct.addEventListener('change', commit);
+      note.addEventListener('blur', function(){ if(note.value !== (t.note||'')) commit(); });
+      tb.appendChild(tr);
+    });
+    if(!tb.children.length) tb.innerHTML='<tr><td colspan="9" class="empty" style="text-align:center;padding:28px">沒有符合的項目</td></tr>';
+  }
+
+  // ── 時程 ──
+  function renderGantt(){
+    var g=$('gantt'); g.innerHTML='';
+    var total = T1 - T0;
+    var months=document.createElement('div'); months.className='g-months';
+    var m=new Date(T0.getFullYear(), T0.getMonth()+1, 1);
+    while(m<T1){ var s=document.createElement('span'); s.style.left=((m-T0)/total*100)+'%'; s.textContent=(m.getMonth()+1)+'月'; months.appendChild(s); m=new Date(m.getFullYear(), m.getMonth()+1, 1); }
+    g.appendChild(months);
+    var body=document.createElement('div'); body.className='g-body';
+    state.tasks.forEach(function(t){
+      if(filterRole && !roleMatch(t, filterRole)) return;
+      if(!t.startD || !t.endD) return;
+      var row=document.createElement('div'); row.className='g-row';
+      var e=new Date(t.endD); e.setDate(e.getDate()+1);
+      var l=Math.max(0,(t.startD-T0)/total*100), w=Math.max(0.6,(e-t.startD)/total*100);
+      var st = isLate(t) && t.status!=='延遲' ? '延遲' : t.status;
+      row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%" title="'+esc(t.id+' '+t.name+'　'+fmt(t.startD)+'→'+fmt(t.endD)+'　'+t.status+' '+effPct(t)+'%')+'"><i style="width:'+effPct(t)+'%"></i></div></div>';
+      body.appendChild(row);
+    });
+    var tx=(today()-T0)/total;
+    if(tx>=0 && tx<=1){ var tl=document.createElement('div'); tl.className='g-today'; tl.style.left='calc(190px + (100% - 190px) * '+tx+')'; body.appendChild(tl); }
+    g.appendChild(body);
+  }
+
+  function renderAll(){
+    $('upd').textContent = state.serverTime || '—';
+    var mode=$('mode'), notice=$('notice');
+    if(demo){ mode.textContent='展示模式（未連線）'; mode.className='badge demo'; notice.className='notice on'; notice.textContent='目前是展示模式：資料來自甘特圖檔案，填寫只會存在這台電腦。按右上角「設定」貼上 Apps Script 網址即可讓全組共用。'; }
+    else { mode.textContent='已連線試算表'; mode.className='badge'; notice.className='notice'; }
+    renderOverview(); renderRoles(); renderRows(); renderGantt();
+    document.querySelectorAll('.filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
+  }
+  function load(){
+    $('mode').textContent='載入中…';
+    fetchAll().then(function(res){
+      state.tasks = (res.tasks||[]).map(normTask); state.roles = res.roles||[]; state.serverTime = res.serverTime||''; renderAll();
+    }).catch(function(err){
+      $('mode').textContent='連線失敗'; $('mode').className='badge demo';
+      $('notice').className='notice on'; $('notice').textContent='無法連到試算表後台：'+err.message+'。請檢查「設定」裡的網址。以下先顯示檔案內的資料。';
+      if(SEED && !state.tasks.length){ state.tasks = SEED.tasks.map(normTask); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); }
+    });
+  }
+
+  // ── 事件 ──
+  function showPage(p){
+    document.querySelectorAll('.page').forEach(function(s){ s.classList.toggle('on', s.id==='page-'+p); });
+    document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.page===p); });
+    ls('page', p); window.scrollTo(0,0);
+  }
+  $('tabs').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) showPage(b.dataset.page); });
+  document.addEventListener('click', function(e){
+    var c=e.target.closest('.filters .chip'); if(c){ filterRole=c.dataset.role||''; renderAll(); return; }
+    var g=e.target.closest('[data-go]'); if(g){ filterRole=g.dataset.go; renderAll(); showPage('tasks'); }
+  });
+  $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
+  $('showMore').addEventListener('change', function(){ showMore=this.checked; renderRows(); });
+  $('reload').addEventListener('click', load);
+  $('cfg').addEventListener('click', function(){ $('gasUrl').value=GAS; $('dlg').showModal(); });
+  $('dlgCancel').addEventListener('click', function(){ $('dlg').close(); });
+  $('dlgSave').addEventListener('click', function(){ ls('gas', $('gasUrl').value.trim()); location.reload(); });
+
+  showPage(ls('page') || 'overview');
+  load();
+})();
+</script>
+</body>
+</html>
