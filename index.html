@@ -98,20 +98,11 @@
   .role .assign input{flex:1;min-width:0;max-width:220px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
   .role .assign .btn{padding:7px 14px;white-space:nowrap}
   .role .assign .msg{font-size:12.5px;white-space:nowrap}
-  .role .tasks{text-align:left;font-size:14.5px;color:var(--ink);line-height:1.7}
-  .role .tasks h4{margin:0 0 6px;font-size:14px;color:var(--ink-2);font-weight:500;text-align:center}
-  .role .tasks ul{margin:0;padding:0;list-style:none}
-  .role .tasks li{position:relative;padding-left:18px;margin:4px 0;display:flex;gap:8px;align-items:baseline}
-  .role .tasks li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
-  .role .tasks li b{color:var(--red);white-space:nowrap}
-  .role .tasks li span{flex:1}
-  .role .tasks li small{white-space:nowrap;color:var(--ink-3);font-size:12.5px}
-  .role .tasks li.done span{color:var(--ink-3);text-decoration:line-through}
-  .role .duty{margin-top:12px;padding-top:10px;border-top:1px dotted var(--line);text-align:left;font-size:13.5px;color:var(--ink-2);line-height:1.65}
-  .role .duty h4{margin:0 0 4px;font-size:13.5px;font-weight:500;color:var(--ink-2);text-align:center}
-  .role .duty ul{margin:0;padding:0 0 0 16px}
-  .role .duty li{margin:2px 0}
-  .role .duty .sub{margin-top:8px;color:var(--ink-3);font-size:13px}
+  .role .duty{text-align:left;font-size:14.5px;color:var(--ink);line-height:1.7}
+  .role .duty ul{margin:0;padding:0;list-style:none}
+  .role .duty li{position:relative;padding-left:18px;margin:4px 0}
+  .role .duty li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .role .duty .sub{margin-top:10px;padding-top:8px;border-top:1px dotted var(--line);color:var(--ink-3);font-size:13px}
   .role .duty .sub div{margin:2px 0}
   .role .go{margin-top:12px}
   .role .go button{font-size:13px;padding:5px 12px}
@@ -163,7 +154,9 @@
   .g-months span{position:absolute;top:3px;border-left:1px solid var(--line);padding-left:6px;height:22px}
   .g-body{position:relative}
   .g-row{display:flex;align-items:center;height:32px}
-  .g-row .lab{width:190px;flex:none;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;text-align:right}
+  .g-row .lab{width:190px;flex:none;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;text-align:left}
+  .g-row .track.nodate{background:repeating-linear-gradient(90deg,var(--line-2) 0,var(--line-2) 6px,transparent 6px,transparent 12px)}
+  .g-row .track.nodate:after{content:"尚未排定日期";font-size:12px;color:var(--ink-3);position:absolute;left:8px;top:-2px}
   .g-row .lab b{color:var(--red);margin-right:4px}
   .g-row .track{flex:1;height:16px;position:relative;background:var(--line-2);border-radius:4px}
   .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:var(--s-none)}
@@ -175,6 +168,16 @@
   .g-legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 
   footer{text-align:center;font-size:13.5px;color:var(--ink-3);padding:28px}
+  td .edit{display:inline-block;margin-top:6px;font-size:12.5px;padding:2px 10px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink-2)}
+  td .edit:hover{border-color:var(--gold);color:var(--gold)}
+  dialog{border:1px solid var(--line);border-radius:14px;padding:24px;max-width:560px;width:92vw;font-family:var(--font);color:var(--ink)}
+  dialog::backdrop{background:rgba(20,40,70,.4)}
+  dialog h2{font-size:20px;color:var(--red-dk);margin-bottom:12px;text-align:center}
+  dialog .frm label{display:block;font-size:13.5px;color:var(--ink-2);margin-bottom:10px}
+  dialog .frm input,dialog .frm textarea,dialog .frm select{display:block;width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:15px}
+  dialog .frm .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  dialog .msg{min-height:20px;font-size:13.5px}
+  dialog .row{display:flex;gap:8px;justify-content:center;margin-top:8px}
   @media (max-width:640px){header h1{font-size:20px}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
 </style>
 </head>
@@ -230,6 +233,7 @@
       <span class="sp"></span>
       <label><input type="checkbox" id="showMore"> 顯示產出與前置</label>
       <label><input type="checkbox" id="hideDone"> 隱藏已完成</label>
+      <button class="btn primary" id="addTask">＋ 新增工作</button>
     </div>
     <div class="twrap"><table id="taskTable">
       <thead><tr>
@@ -248,6 +252,25 @@
     </div>
   </section>
 </main>
+
+<dialog id="taskDlg">
+  <h2 id="taskDlgTitle">新增工作</h2>
+  <div class="frm">
+    <label>工作項目<input id="f-name" maxlength="40" placeholder="例：確認遊覽車報價"></label>
+    <label>工作細項／說明<textarea id="f-detail" rows="2" placeholder="要做什麼、做到什麼程度"></textarea></label>
+    <label>主要產出<input id="f-output" maxlength="40" placeholder="例：報價比較表"></label>
+    <div class="two">
+      <label>負責位子<select id="f-role"></select></label>
+      <label>人天<input id="f-days" type="number" min="0.5" max="30" step="0.5" value="1"></label>
+    </div>
+    <div class="two">
+      <label>預計開始<input id="f-start" type="date"></label>
+      <label>預計完成<input id="f-end" type="date"></label>
+    </div>
+    <div class="msg" id="f-msg"></div>
+  </div>
+  <div class="row"><button class="btn" id="taskCancel">取消</button><button class="btn primary" id="taskSave">儲存</button></div>
+</dialog>
 
 <footer>2027 尾牙活動組 進度板 · 資料來源：活動組工作甘特圖「進度資料」分頁</footer>
 
@@ -306,6 +329,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function loadLocal(){
     var saved = null; try{ saved = JSON.parse(ls('demo') || 'null'); }catch(e){}
     var base = JSON.parse(JSON.stringify(SEED));
+    var extra=[]; try{ extra=JSON.parse(ls('extra')||'[]'); }catch(e){}
+    extra.forEach(function(x){ base.tasks.push(x); });
     if(saved){ base.tasks.forEach(function(t){ if(saved[t.id]) Object.assign(t, saved[t.id]); }); }
     var rs={}; try{ rs=JSON.parse(ls('roles')||'{}'); }catch(e){}
     base.roles.forEach(function(r){ var k=r.role.replace(/\s/g,''); if(rs[k]) r.person=rs[k]; });
@@ -319,6 +344,23 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
   function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, by:t.by, start:iso(t.startD), end:iso(t.endD) }); }
+  function pushEdit(t){
+    if(!demo) return jsonp({ action:'edit', id:t.id, name:t.name, detail:t.detail, output:t.output, role:t.role, days:t.days, start:iso(t.startD), end:iso(t.endD), by:t.by });
+    var saved={}; try{ saved=JSON.parse(ls('demo')||'{}'); }catch(e){}
+    saved[t.id]=Object.assign(saved[t.id]||{}, { name:t.name, detail:t.detail, output:t.output, role:t.role, days:t.days, start:iso(t.startD), end:iso(t.endD), by:t.by, at:t.at, load:loadOf(t.days) });
+    ls('demo', JSON.stringify(saved)); t.load=loadOf(t.days); t.person=personsForTask(t);
+    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+  }
+  function pushAdd(t){
+    if(!demo) return jsonp({ action:'add', name:t.name, detail:t.detail, output:t.output, role:t.role, days:t.days, start:t.start, end:t.end, by:t.by });
+    var extra=[]; try{ extra=JSON.parse(ls('extra')||'[]'); }catch(e){}
+    var maxNo=0; state.tasks.forEach(function(x){ var m=/^A(\d+)$/.exec(x.id); if(m) maxNo=Math.max(maxNo,+m[1]); });
+    t.id='A'+('0'+(maxNo+1)).slice(-2); t.status='未開始'; t.pct=0; t.note=''; t.pre='—'; t.load=loadOf(t.days); t.hours='';
+    extra.push(t); ls('extra', JSON.stringify(extra));
+    state.tasks.push(normTask(JSON.parse(JSON.stringify(t)))); state.tasks[state.tasks.length-1].person=personsForTask(t);
+    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+  }
+  function loadOf(d){ return d>=5?'高':(d>=3?'中':'低'); }
   function pushAssign(role, person){
     if(!demo) return jsonp({ action:'assign', role:role, person:person });
     // 展示模式：存本機，並依位子重算每項工作的負責人
@@ -408,8 +450,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
         + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--red)"></i>完成 '+pct+'%</span></div>'
         + '<div class="who">負責人：'+(r.person ? '<b>'+esc(r.person)+'</b>' : '<span class="na">待填</span>')+'</div>'
-        + '<div class="tasks"><h4>工作項目（'+mine.length+' 項）</h4><ul>'+mine.map(function(t){ return '<li class="'+(t.status==='已完成'?'done':'')+'"><b>'+esc(t.id)+'</b><span>'+esc(t.name)+'</span><small>'+t.days+' 人天</small></li>'; }).join('')+'</ul></div>'
-        + '<div class="duty"><h4>職掌</h4><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
+        + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
         + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x){ return !/^甘特圖/.test(x); }).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
         + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>'
         + '<div class="assign"><input placeholder="填負責人名字" maxlength="20" value="'+esc(r.person||'')+'"><button class="btn primary">儲存</button><span class="msg"></span></div>';
@@ -440,7 +481,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       var tr = document.createElement('tr'); tr.className = (late?'late ':'')+(t.status==='已完成'?'done':'');
       tr.innerHTML =
         '<td class="id">'+esc(t.id)+'</td>'
-        + '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+(t.pre&&t.pre!=='—'?'　前置：'+esc(t.pre):'')+'</div></td>'
+        + '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+(t.pre&&t.pre!=='—'?'　前置：'+esc(t.pre):'')+'</div><button class="edit" type="button">修改</button></td>'
         + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
         + '<td><span class="load '+esc(t.load)+'">'+t.days+' 人天 · '+esc(t.load)+'</span><span class="hours">'+esc(t.hours||'')+'</span></td>'
         + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
@@ -465,6 +506,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       }
       dS.addEventListener('change', commitDates);
       dE.addEventListener('change', commitDates);
+      tr.querySelector('.edit').addEventListener('click', function(){ openTaskDlg(t); });
       function commit(){
         var me=(meInput.value||'').trim();
         if(!me){ meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
@@ -499,8 +541,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var body=document.createElement('div'); body.className='g-body';
     state.tasks.forEach(function(t){
       if(filterRole && !roleMatch(t, filterRole)) return;
-      if(!t.startD || !t.endD) return;
       var row=document.createElement('div'); row.className='g-row';
+      if(!t.startD || !t.endD){ row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track nodate"></div>'; body.appendChild(row); return; }
       var e=new Date(t.endD); e.setDate(e.getDate()+1);
       var l=Math.max(0,(t.startD-T0)/total*100), w=Math.max(0.6,(e-t.startD)/total*100);
       var st = isLate(t) && t.status!=='延遲' ? '延遲' : t.status;
@@ -545,6 +587,40 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
   $('showMore').addEventListener('change', function(){ showMore=this.checked; renderRows(); });
   $('reload').addEventListener('click', load);
+
+  // ── 新增／修改工作 ──
+  var editing = null;
+  function openTaskDlg(t){
+    editing = t || null;
+    $('taskDlgTitle').textContent = t ? '修改 '+t.id : '新增工作';
+    var sel=$('f-role'); sel.innerHTML = state.roles.map(function(r){ return '<option>'+esc(r.role.replace(/\s/g,''))+'</option>'; }).join('') + '<option>全組</option>';
+    $('f-name').value = t ? t.name : ''; $('f-detail').value = t ? (t.detail||'') : ''; $('f-output').value = t ? (t.output||'') : '';
+    if(t){ var cur=String(t.role||'').replace(/\s/g,''); if(![].some.call(sel.options,function(o){return o.value===cur;})){ var o=document.createElement('option'); o.textContent=cur; sel.appendChild(o); } sel.value=cur; }
+    $('f-days').value = t ? t.days : 1;
+    $('f-start').value = t ? iso(t.startD) : iso(today()); $('f-end').value = t ? iso(t.endD) : iso(today());
+    $('f-msg').innerHTML=''; $('taskSave').disabled=false;
+    $('taskDlg').showModal();
+  }
+  $('addTask').addEventListener('click', function(){ openTaskDlg(null); });
+  $('taskCancel').addEventListener('click', function(){ $('taskDlg').close(); });
+  $('taskSave').addEventListener('click', function(){
+    var me=(meInput.value||'').trim(), msg=$('f-msg');
+    if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
+    var name=$('f-name').value.trim(); if(!name){ msg.innerHTML='<span class="err">請填工作項目名稱</span>'; return; }
+    var st=$('f-start').value, en=$('f-end').value;
+    if(st && en && en<st){ msg.innerHTML='<span class="err">結束不能早於開始</span>'; return; }
+    var n=new Date(), at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
+    var payload={ name:name, detail:$('f-detail').value.trim(), output:$('f-output').value.trim(), role:$('f-role').value, days:Number($('f-days').value)||1, start:st, end:en, by:me, at:at };
+    msg.innerHTML='<span class="saving">儲存中…</span>'; $('taskSave').disabled=true;
+    var pr;
+    if(editing){ Object.assign(editing, payload); normTask(editing); pr=pushEdit(editing); }
+    else pr=pushAdd(payload);
+    pr.then(function(res){
+      if(res.roles) state.roles=res.roles;
+      if(res.tasks){ state.tasks=res.tasks.map(normTask); }
+      state.serverTime=res.serverTime||state.serverTime; $('taskDlg').close(); renderAll();
+    }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('taskSave').disabled=false; });
+  });
 
   showPage(ls('page') || 'overview');
   load();
