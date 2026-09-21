@@ -9,22 +9,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#C1472E; --red-dk:#9A3320; --gold:#E9A23B; --cream:#FBF1DF; --paper:#FFFBF3;
-    --ink:#2E211A; --ink-2:#5E4A3C; --ink-3:#8C7A6B; --line:#E9D3B0; --line-2:#F5E8D2;
-    --s-none:#B9AB98; --s-doing:#C98A1E; --s-done:#5F8F3E; --s-late:#B8382A;
+    --red:#2B5C8A; --red-dk:#1F4566; --gold:#EE8A2E; --cream:#F3F6FA; --paper:#FFFFFF;
+    --ink:#1F2933; --ink-2:#4A5A6A; --ink-3:#7E8B99; --line:#D8E1EC; --line-2:#EDF2F7;
+    --s-none:#B5BEC9; --s-doing:#EE8A2E; --s-done:#3E9B5B; --s-late:#D14B3C;
     --font:"Noto Sans TC","Microsoft JhengHei","微軟正黑體","PingFang TC",sans-serif;
     --display:"Noto Serif TC","Noto Sans TC","Microsoft JhengHei",serif;
-    --shadow:0 3px 14px rgba(120,70,20,.10);
+    --shadow:0 3px 14px rgba(30,60,90,.10);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--cream);background-image:linear-gradient(180deg,#F7E6C8 0,var(--cream) 320px);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--cream);background-image:linear-gradient(180deg,#E3ECF5 0,var(--cream) 320px);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
   h1,h2,h3{font-family:var(--display);margin:0;font-weight:700;letter-spacing:.02em}
   button,select,input,textarea{font:inherit;color:inherit}
   a{color:var(--red)}
 
   /* ── 頁首 ── */
-  header{background:linear-gradient(135deg,#C1472E 0,#A83A22 100%);color:#fff;box-shadow:0 2px 10px rgba(90,30,10,.3);position:sticky;top:0;z-index:20}
+  header{background:linear-gradient(135deg,#2B5C8A 0,#1F4566 100%);color:#fff;box-shadow:0 2px 10px rgba(20,40,70,.3);position:sticky;top:0;z-index:20}
   header .in{max-width:1200px;margin:0 auto;padding:16px 20px 0;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;text-align:center}
   header .in > div:first-child{flex-basis:100%}
   header h1{font-size:28px;letter-spacing:.06em}
@@ -47,7 +47,7 @@
   /* ── 主體 ── */
   main{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
   .page{display:none}.page.on{display:block}
-  .notice{background:#FFF1CC;border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:20px;display:none;text-align:center}
+  .notice{background:#FFF0E0;border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:20px;display:none;text-align:center}
   .notice.on{display:block}
   .sec-h{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 20px;text-align:center}
   .sec-h h2{font-size:26px;color:var(--red-dk)}
@@ -63,7 +63,7 @@
   .tile .bar{height:8px;background:var(--line-2);border-radius:99px;margin-top:10px;overflow:hidden}
   .tile .bar i{display:block;height:100%;background:var(--s-done);border-radius:99px;transition:width .4s}
   .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-  .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-family:var(--display);font-size:18px;color:var(--red-dk);text-align:center;background:#FBEBD2;border-radius:14px 14px 0 0}
+  .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-family:var(--display);font-size:18px;color:var(--red-dk);text-align:center;background:#E8F0F8;border-radius:14px 14px 0 0}
   .card .bd{padding:8px 18px 14px}
   .rlist{list-style:none;margin:0;padding:0}
   .rlist li{display:grid;grid-template-columns:120px 1fr 52px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:15px}
@@ -89,7 +89,7 @@
   .role .bar{height:12px;background:var(--line-2);border-radius:99px;overflow:hidden;position:relative}
   .role .bar i{position:absolute;left:0;top:0;height:100%;border-radius:99px}
   .role .bar i.load{background:var(--gold)}
-  .role .bar i.done{background:var(--s-done)}
+  .role .bar i.done{background:var(--red)}
   .role .legend{display:flex;justify-content:center;gap:16px;font-size:13.5px;color:var(--ink-2);margin-top:8px}
   .role .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .role .who{font-size:16px;margin:14px 0 10px;padding-top:12px;border-top:1px dashed var(--line)}
@@ -98,11 +98,20 @@
   .role .assign input{flex:1;min-width:0;max-width:220px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
   .role .assign .btn{padding:7px 14px;white-space:nowrap}
   .role .assign .msg{font-size:12.5px;white-space:nowrap}
-  .role .duty{font-size:14.5px;color:var(--ink);text-align:left;line-height:1.7}
-  .role .duty ul{margin:0;padding:0 0 0 2px;list-style:none}
-  .role .duty li{position:relative;padding-left:18px;margin:4px 0}
-  .role .duty li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
-  .role .duty .sub{margin-top:10px;padding-top:8px;border-top:1px dotted var(--line);font-size:13.5px;color:var(--ink-2)}
+  .role .tasks{text-align:left;font-size:14.5px;color:var(--ink);line-height:1.7}
+  .role .tasks h4{margin:0 0 6px;font-size:14px;color:var(--ink-2);font-weight:500;text-align:center}
+  .role .tasks ul{margin:0;padding:0;list-style:none}
+  .role .tasks li{position:relative;padding-left:18px;margin:4px 0;display:flex;gap:8px;align-items:baseline}
+  .role .tasks li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .role .tasks li b{color:var(--red);white-space:nowrap}
+  .role .tasks li span{flex:1}
+  .role .tasks li small{white-space:nowrap;color:var(--ink-3);font-size:12.5px}
+  .role .tasks li.done span{color:var(--ink-3);text-decoration:line-through}
+  .role .duty{margin-top:12px;padding-top:10px;border-top:1px dotted var(--line);text-align:left;font-size:13.5px;color:var(--ink-2);line-height:1.65}
+  .role .duty h4{margin:0 0 4px;font-size:13.5px;font-weight:500;color:var(--ink-2);text-align:center}
+  .role .duty ul{margin:0;padding:0 0 0 16px}
+  .role .duty li{margin:2px 0}
+  .role .duty .sub{margin-top:8px;color:var(--ink-3);font-size:13px}
   .role .duty .sub div{margin:2px 0}
   .role .go{margin-top:12px}
   .role .go button{font-size:13px;padding:5px 12px}
@@ -119,9 +128,9 @@
   table{border-collapse:collapse;width:100%;font-size:15px;min-width:1080px}
   th,td{padding:14px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle;text-align:center}
   td:nth-child(2){text-align:left}
-  th{background:#F7E4C4;color:var(--red-dk);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
+  th{background:#E8F0F8;color:var(--red-dk);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
   tr:last-child td{border-bottom:none}
-  tr.late td{background:#FFF5F3}
+  tr.late td{background:#FFF3F1}
   tr.done td{color:#8a8078}
   td.id{font-weight:700;white-space:nowrap;color:var(--red)}
   td .name{font-weight:700;font-size:16px}
@@ -129,7 +138,7 @@
   td .more{font-size:13px;color:var(--ink-3);margin-top:4px;display:none}
   .showmore td .more{display:block}
   .load{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13.5px;white-space:nowrap;font-weight:500}
-  .load.高{background:#F4B889;color:#6B2E10}.load.中{background:#F8DE9A;color:#6B4A00}.load.低{background:#DCEBC4;color:#2F5A18}
+  .load.高{background:#F9C9A3;color:#7A3A10}.load.中{background:#FBE3B8;color:#7A5200}.load.低{background:#D4E8F5;color:#1F4566}
   td .hours{font-size:13px;color:var(--ink-2);display:block;margin-top:6px;line-height:1.5}
   td .dates{white-space:nowrap;font-weight:500}
   td .left{font-size:13px;display:block;margin-top:4px;color:var(--ink-2)}
@@ -207,7 +216,7 @@
 
   <!-- 分工比例 -->
   <section class="page" id="page-roles">
-    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的人天 ÷ 全組總人天；黃條是負荷、綠條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人</span></div>
+    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的人天 ÷ 全組總人天；橘條是負荷、藍條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人</span></div>
     <div class="roles" id="roles"></div>
   </section>
 
@@ -394,10 +403,11 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       el.innerHTML = '<div class="top"><b>'+esc(r.role)+'</b><em>'+Math.round(r.ratio*100)+'%</em></div>'
         + '<div class="meta">約 '+r.days+' 人天 · '+r.hours+' 小時 · 平均每週約 '+r.weekly+' 小時 · '+mine.length+' 項工作</div>'
         + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
-        + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--s-done)"></i>完成 '+pct+'%</span></div>'
+        + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--red)"></i>完成 '+pct+'%</span></div>'
         + '<div class="who">負責人：'+(r.person ? '<b>'+esc(r.person)+'</b>' : '<span class="na">待填</span>')+'</div>'
-        + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
-        + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
+        + '<div class="tasks"><h4>工作項目（'+mine.length+' 項）</h4><ul>'+mine.map(function(t){ return '<li class="'+(t.status==='已完成'?'done':'')+'"><b>'+esc(t.id)+'</b><span>'+esc(t.name)+'</span><small>'+t.days+' 人天</small></li>'; }).join('')+'</ul></div>'
+        + '<div class="duty"><h4>職掌</h4><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
+        + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x){ return !/^甘特圖/.test(x); }).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
         + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>'
         + '<div class="assign"><input placeholder="填負責人名字" maxlength="20" value="'+esc(r.person||'')+'"><button class="btn primary">儲存</button><span class="msg"></span></div>';
       var inp=el.querySelector('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
