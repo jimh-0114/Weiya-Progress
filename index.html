@@ -140,7 +140,9 @@
   .load{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13.5px;white-space:nowrap;font-weight:500}
   .load.高{background:#F9C9A3;color:#7A3A10}.load.中{background:#FBE3B8;color:#7A5200}.load.低{background:#D4E8F5;color:#1F4566}
   td .hours{font-size:13px;color:var(--ink-2);display:block;margin-top:6px;line-height:1.5}
-  td .dates{white-space:nowrap;font-weight:500}
+  td .dates{white-space:nowrap;display:flex;flex-direction:column;gap:4px;align-items:center}
+  td .dates input{padding:4px 6px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13.5px;width:132px;text-align:center}
+  td .dates input:focus{border-color:var(--gold);outline:none}
   td .left{font-size:13px;display:block;margin-top:4px;color:var(--ink-2)}
   td .left.warn{color:var(--s-late);font-weight:500}
   select.status{padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:500}
@@ -222,7 +224,7 @@
 
   <!-- 填進度 -->
   <section class="page" id="page-tasks">
-    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改狀態、完成％或備註後會自動存檔</span></div>
+    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、狀態、完成％或備註後會自動存檔</span></div>
     <div class="filters" id="filters">
       <button class="chip on" data-role="">全部</button>
       <span class="sp"></span>
@@ -283,6 +285,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function today(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
   function fmt(x){ return x ? (x.getMonth()+1)+'/'+x.getDate() : '—'; }
+  function iso(x){ return x ? x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()) : ''; }
   function pad(n){ return (n<10?'0':'')+n; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
@@ -310,12 +313,12 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function saveLocal(t){
     var saved = {}; try{ saved = JSON.parse(ls('demo') || '{}'); }catch(e){}
-    saved[t.id] = { status:t.status, pct:t.pct, note:t.note, by:t.by, at:t.at };
+    saved[t.id] = { status:t.status, pct:t.pct, note:t.note, by:t.by, at:t.at, start:iso(t.startD), end:iso(t.endD) };
     ls('demo', JSON.stringify(saved));
     return Promise.resolve({ ok:true, serverTime:'展示模式' });
   }
   function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
-  function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, by:t.by }); }
+  function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, by:t.by, start:iso(t.startD), end:iso(t.endD) }); }
   function pushAssign(role, person){
     if(!demo) return jsonp({ action:'assign', role:role, person:person });
     // 展示模式：存本機，並依位子重算每項工作的負責人
@@ -440,12 +443,28 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+(t.pre&&t.pre!=='—'?'　前置：'+esc(t.pre):'')+'</div></td>'
         + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
         + '<td><span class="load '+esc(t.load)+'">'+t.days+' 人天 · '+esc(t.load)+'</span><span class="hours">'+esc(t.hours||'')+'</span></td>'
-        + '<td><span class="dates">'+fmt(t.startD)+' → '+fmt(t.endD)+'</span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
+        + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
         + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成','延遲'].map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
         + '<td><input class="pct" type="number" min="0" max="100" step="5" value="'+effPct(t)+'"></td>'
         + '<td><textarea class="note" placeholder="備註…">'+esc(t.note||'')+'</textarea></td>'
         + '<td><div class="by">'+(t.by ? esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16)) : '—')+'</div><div class="msg"></div></td>';
       var sel=tr.querySelector('select'), pct=tr.querySelector('input.pct'), note=tr.querySelector('textarea'), msg=tr.querySelector('.msg');
+      var dS=tr.querySelector('.d-start'), dE=tr.querySelector('.d-end');
+      function commitDates(){
+        var me=(meInput.value||'').trim();
+        if(!me){ meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">請先在右上角填名字</span>'; dS.value=iso(t.startD); dE.value=iso(t.endD); return; }
+        if(!dS.value || !dE.value) return;
+        if(dE.value < dS.value){ msg.innerHTML='<span class="err">結束不能早於開始</span>'; dS.value=iso(t.startD); dE.value=iso(t.endD); return; }
+        t.start=dS.value; t.end=dE.value; t.by=me; var n=new Date(); t.at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
+        normTask(t);
+        msg.innerHTML='<span class="saving">儲存中…</span>';
+        pushUpdate(t).then(function(res){
+          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          state.serverTime=res.serverTime||state.serverTime; renderAll();
+        }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
+      }
+      dS.addEventListener('change', commitDates);
+      dE.addEventListener('change', commitDates);
       function commit(){
         var me=(meInput.value||'').trim();
         if(!me){ meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
