@@ -92,6 +92,10 @@
   .role .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .role .who{font-size:14px;margin:12px 0 10px;padding-top:10px;border-top:1px dashed var(--line)}
   .role .who span.na{color:var(--ink-3)}
+  .role .assign{display:flex;gap:8px;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .role .assign input{flex:1;min-width:0;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:#fff}
+  .role .assign .btn{padding:7px 14px;white-space:nowrap}
+  .role .assign .msg{font-size:12.5px;white-space:nowrap}
   .role .duty{font-size:13.5px;color:var(--ink-2)}
   .role .duty small{display:block;color:var(--ink-3);margin-top:6px;font-size:12.5px}
   .role .go{margin-top:12px}
@@ -204,7 +208,7 @@
 
   <!-- 分工比例 -->
   <section class="page" id="page-roles">
-    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的人天 ÷ 全組總人天；黃條是負荷、綠條是該位子項目的完成率</span></div>
+    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的人天 ÷ 全組總人天；黃條是負荷、綠條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人</span></div>
     <div class="roles" id="roles"></div>
   </section>
 
@@ -300,6 +304,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var saved = null; try{ saved = JSON.parse(ls('demo') || 'null'); }catch(e){}
     var base = JSON.parse(JSON.stringify(SEED));
     if(saved){ base.tasks.forEach(function(t){ if(saved[t.id]) Object.assign(t, saved[t.id]); }); }
+    var rs={}; try{ rs=JSON.parse(ls('roles')||'{}'); }catch(e){}
+    base.roles.forEach(function(r){ var k=r.role.replace(/\s/g,''); if(rs[k]) r.person=rs[k]; });
     return Promise.resolve({ ok:true, tasks: base.tasks, roles: base.roles, serverTime: '展示模式' });
   }
   function saveLocal(t){
@@ -310,6 +316,26 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
   function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, by:t.by }); }
+  function pushAssign(role, person){
+    if(!demo) return jsonp({ action:'assign', role:role, person:person });
+    // 展示模式：存本機，並依位子重算每項工作的負責人
+    var saved={}; try{ saved=JSON.parse(ls('roles')||'{}'); }catch(e){}
+    saved[role.replace(/\s/g,'')]=person; ls('roles', JSON.stringify(saved));
+    state.roles.forEach(function(r){ if(r.role.replace(/\s/g,'')===role.replace(/\s/g,'')) r.person=person; });
+    state.tasks.forEach(function(t){ t.person = personsForTask(t); });
+    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+  }
+  function personsForTask(t){
+    var map={}; state.roles.forEach(function(r){ map[r.role.replace(/\s/g,'')]=r.person||''; });
+    var out=[]; function add(x){ if(x && out.indexOf(x)<0) out.push(x); }
+    roleKeys(t).forEach(function(k){
+      if(k==='全組') Object.keys(map).forEach(function(rk){ add(map[rk]); });
+      else if(k==='內容') Object.keys(map).forEach(function(rk){ if(/內容$/.test(rk)) add(map[rk]); });
+      else if(k==='執行') Object.keys(map).forEach(function(rk){ if(/執行$/.test(rk)) add(map[rk]); });
+      else { var b=k.replace(/（.*?）/g,''); add(map[k]||map[b]); }
+    });
+    return out.join('、');
+  }
 
   // ── 計算 ──
   function effPct(t){ return t.status==='已完成' ? 100 : Math.max(0, Math.min(100, t.pct)); }
@@ -372,16 +398,28 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     state.roles.forEach(function(r){
       var mine = state.tasks.filter(function(t){ return roleMatch(t, r.role); });
       var pct = rolePct(r.role);
-      var people={}; mine.forEach(function(t){ if(t.person) String(t.person).split(/[、,\s]+/).forEach(function(p){ if(p) people[p]=1; }); });
       var loadW = Math.round(r.ratio/maxRatio*100);
       var el = document.createElement('div'); el.className='role';
       el.innerHTML = '<div class="top"><b>'+esc(r.role)+'</b><em>'+Math.round(r.ratio*100)+'%</em></div>'
         + '<div class="meta">約 '+r.days+' 人天 · '+r.hours+' 小時 · 平均每週約 '+r.weekly+' 小時 · '+mine.length+' 項工作</div>'
         + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
         + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--s-done)"></i>完成 '+pct+'%</span></div>'
-        + '<div class="who">負責人：'+(Object.keys(people).length ? esc(Object.keys(people).join('、')) : '<span class="na">待填</span>')+'</div>'
+        + '<div class="who">負責人：'+(r.person ? '<b>'+esc(r.person)+'</b>' : '<span class="na">待填</span>')+'</div>'
         + '<div class="duty">'+esc(r.duty||'')+'<small>'+esc(r.note||'')+'</small></div>'
-        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>';
+        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>'
+        + '<div class="assign"><input placeholder="填負責人名字" maxlength="20" value="'+esc(r.person||'')+'"><button class="btn primary">儲存</button><span class="msg"></span></div>';
+      var inp=el.querySelector('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
+      function doAssign(){
+        var v=inp.value.trim(); if(v===(r.person||'')) return;
+        am.innerHTML='<span class="saving">儲存中…</span>'; sbtn.disabled=true;
+        pushAssign(r.role, v).then(function(res){
+          if(res.roles) state.roles=res.roles;
+          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          state.serverTime=res.serverTime||state.serverTime; renderAll();
+        }).catch(function(err){ am.innerHTML='<span class="err">'+esc(err.message)+'</span>'; sbtn.disabled=false; });
+      }
+      sbtn.addEventListener('click', doAssign);
+      inp.addEventListener('keydown', function(e){ if(e.key==='Enter') doAssign(); });
       box.appendChild(el);
     });
   }
