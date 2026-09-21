@@ -98,8 +98,12 @@
   .role .assign input{flex:1;min-width:0;max-width:220px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
   .role .assign .btn{padding:7px 14px;white-space:nowrap}
   .role .assign .msg{font-size:12.5px;white-space:nowrap}
-  .role .duty{font-size:14px;color:var(--ink-2);text-align:left;line-height:1.7}
-  .role .duty small{display:block;color:var(--ink-3);margin-top:6px;font-size:13px}
+  .role .duty{font-size:14.5px;color:var(--ink);text-align:left;line-height:1.7}
+  .role .duty ul{margin:0;padding:0 0 0 2px;list-style:none}
+  .role .duty li{position:relative;padding-left:18px;margin:4px 0}
+  .role .duty li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+  .role .duty .sub{margin-top:10px;padding-top:8px;border-top:1px dotted var(--line);font-size:13.5px;color:var(--ink-2)}
+  .role .duty .sub div{margin:2px 0}
   .role .go{margin-top:12px}
   .role .go button{font-size:13px;padding:5px 12px}
 
@@ -408,7 +412,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
         + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+Math.round(r.ratio*100)+'%</span><span><i style="background:var(--s-done)"></i>完成 '+pct+'%</span></div>'
         + '<div class="who">負責人：'+(r.person ? '<b>'+esc(r.person)+'</b>' : '<span class="na">待填</span>')+'</div>'
-        + '<div class="duty">'+esc(r.duty||'')+'<small>'+esc(r.note||'')+'</small></div>'
+        + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
+        + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
         + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>'
         + '<div class="assign"><input placeholder="填負責人名字" maxlength="20" value="'+esc(r.person||'')+'"><button class="btn primary">儲存</button><span class="msg"></span></div>';
       var inp=el.querySelector('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
