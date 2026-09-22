@@ -159,9 +159,9 @@
   .g-row .track.nodate:after{content:"尚未排定日期";font-size:12px;color:var(--ink-3);position:absolute;left:8px;top:-2px}
   .g-row .lab b{color:var(--red);margin-right:4px}
   .g-row .track{flex:1;height:16px;position:relative;background:var(--line-2);border-radius:4px}
-  .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:var(--s-none)}
-  .g-row .bar.進行中{background:var(--s-doing)}.g-row .bar.已完成{background:var(--s-done)}.g-row .bar.延遲{background:var(--s-late)}
-  .g-row .bar i{position:absolute;left:0;top:0;height:100%;background:rgba(255,255,255,.5);border-radius:4px 0 0 4px}
+  .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:#CFE6D6;overflow:hidden}
+  .g-row .bar.延遲{background:#F6D3CE}
+  .g-row .bar i{position:absolute;left:0;top:0;height:100%;background:var(--s-done);border-radius:4px}
   .g-today{position:absolute;top:0;bottom:0;border-left:2px dashed var(--red);pointer-events:none}
   .g-today:after{content:"今天";position:absolute;top:-22px;left:4px;font-size:11px;color:var(--red);white-space:nowrap}
   .g-legend{display:flex;justify-content:center;gap:18px;font-size:14px;color:var(--ink-2);margin-top:14px;flex-wrap:wrap}
@@ -245,10 +245,10 @@
 
   <!-- 時程 -->
   <section class="page" id="page-timeline">
-    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；條內淺色是完成％</span></div>
+    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；綠色是完成％</span></div>
     <div class="filters" id="filters2"><button class="chip on" data-role="">全部</button><span class="sp"></span></div>
     <div class="gwrap"><div class="gantt" id="gantt"></div>
-      <div class="g-legend"><span><i style="background:var(--s-none)"></i>未開始</span><span><i style="background:var(--s-doing)"></i>進行中</span><span><i style="background:var(--s-done)"></i>已完成</span><span><i style="background:var(--s-late)"></i>延遲</span></div>
+      <div class="g-legend"><span><i style="background:var(--s-done)"></i>已完成％</span><span><i style="background:#CFE6D6"></i>未完成</span><span><i style="background:#F6D3CE"></i>逾期未完成</span></div>
     </div>
   </section>
 </main>
