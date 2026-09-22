@@ -25,7 +25,7 @@
 
   /* ── 頁首 ── */
   header{background:linear-gradient(135deg,#2B5C8A 0,#1F4566 100%);color:#fff;box-shadow:0 2px 10px rgba(20,40,70,.3);position:sticky;top:0;z-index:20}
-  header .in{max-width:1200px;margin:0 auto;padding:16px 20px 0;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;text-align:center}
+  header .in{max-width:1400px;margin:0 auto;padding:16px 20px 0;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;text-align:center}
   header .in > div:first-child{flex-basis:100%}
   header h1{font-size:28px;letter-spacing:.06em}
   header .sub{font-size:14px;opacity:.9;margin-top:4px}
@@ -38,14 +38,14 @@
   .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
   .btn.ghost:hover{background:rgba(255,255,255,.12)}
   .btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
-  nav.tabs{max-width:1200px;margin:12px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs{max-width:1400px;margin:12px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{background:transparent;border:0;color:rgba(255,255,255,.88);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
   nav.tabs button:hover{color:#fff}
   nav.tabs button.on{color:#fff;border-bottom-color:var(--gold);font-weight:500}
 
   /* ── 主體 ── */
-  main{max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+  main{max-width:1400px;margin:0 auto;padding:24px 20px 80px}
   .page{display:none}.page.on{display:block}
   .notice{background:#FFF0E0;border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:20px;display:none;text-align:center}
   .notice.on{display:block}
@@ -117,9 +117,11 @@
 
   /* 填進度 */
   .twrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
-  table{border-collapse:collapse;width:100%;font-size:15px;min-width:1080px}
+  table{border-collapse:collapse;width:100%;font-size:15px;min-width:1300px;table-layout:fixed}
   th,td{padding:14px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle;text-align:center}
   td:nth-child(2){text-align:left}
+  td:nth-child(2) .name{line-height:1.5}
+  td .by{white-space:normal}
   th{background:#E8F0F8;color:var(--red-dk);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
   tr:last-child td{border-bottom:none}
   tr.late td{background:#FFF3F1}
@@ -145,8 +147,8 @@
   select.status.已完成{border-color:var(--s-done);color:var(--s-done)}
   select.status.延遲{border-color:var(--s-late);color:var(--s-late)}
   input.pct{width:70px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);text-align:right}
-  textarea.note{width:200px;min-height:44px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);resize:vertical;line-height:1.5;text-align:left}
-  td .by{font-size:13px;color:var(--ink-2);white-space:nowrap;line-height:1.5}
+  textarea.note{width:100%;min-height:44px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);resize:vertical;line-height:1.5;text-align:left}
+  td .by{font-size:13px;color:var(--ink-2);line-height:1.5}
   td .msg{font-size:13px;margin-top:4px}
   .saving{color:var(--s-doing)}.saved{color:var(--s-done)}.err{color:var(--s-late)}
 
@@ -242,6 +244,7 @@
       <button class="btn primary" id="addTask">＋ 新增工作</button>
     </div>
     <div class="twrap"><table id="taskTable">
+      <colgroup><col style="width:60px"><col><col style="width:150px"><col style="width:140px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
       <thead><tr>
         <th>編號</th><th>工作項目</th><th>負責</th><th>工作量／預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
       </tr></thead>
