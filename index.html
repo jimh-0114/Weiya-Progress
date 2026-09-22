@@ -82,8 +82,8 @@
   .empty{color:var(--ink-3);font-size:15px;padding:12px 0;text-align:center}
 
   /* 分工比例 */
-  .roles{display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
-  @media (max-width:1000px){.roles{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}}
+  .roles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  @media (min-width:1280px){.roles{grid-template-columns:repeat(5,1fr)}.role{padding:20px 14px}.role .top b{font-size:19px}.role .duty{font-size:13px}}
   .role{background:var(--paper);border:1px solid var(--line);border-top:5px solid var(--gold);border-radius:14px;padding:22px 22px;box-shadow:var(--shadow);text-align:center;min-width:0}
   .role .top{display:flex;flex-direction:column;align-items:center;gap:2px}
   .role .top b{font-family:var(--display);font-size:20px;color:var(--red-dk)}
@@ -227,7 +227,7 @@
       <div class="tile"><b id="t-days">—</b><span>距活動日</span></div>
     </div>
     <div class="grid2">
-      <div class="card"><div class="hd">各組完成率</div><div class="bd"><ul class="rlist" id="ov-roles"></ul></div></div>
+      <div class="card"><div class="hd">各位子完成率</div><div class="bd"><ul class="rlist" id="ov-roles"></ul></div></div>
       <div class="card"><div class="hd">最近要到期</div><div class="bd"><ul class="dlist" id="ov-due"></ul></div></div>
       <div class="card"><div class="hd">進行中</div><div class="bd"><ul class="dlist" id="ov-doing"></ul></div></div>
       <div class="card"><div class="hd">最近更新</div><div class="bd"><ul class="dlist" id="ov-recent"></ul></div></div>
@@ -236,7 +236,7 @@
 
   <!-- 分工比例 -->
   <section class="page" id="page-roles">
-    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該組分攤的預估時數 ÷ 全組總時數，多組共責的工作平均分攤；橘條是負荷、藍條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人；戶外、餐會各兩人</span></div>
+    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的預估時數 ÷ 全組總時數，多人共責的工作平均分攤；橘條是負荷、藍條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人</span></div>
     <div class="roles" id="roles"></div>
   </section>
 
@@ -253,7 +253,7 @@
     <div class="twrap"><table id="taskTable">
       <colgroup><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
       <thead><tr>
-        <th>工作項目</th><th>負責組別</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
+        <th>工作項目</th><th>負責位子</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
@@ -276,7 +276,7 @@
     <label>工作細項／說明<textarea id="f-detail" rows="2" placeholder="要做什麼、做到什麼程度"></textarea></label>
     <label>主要產出<input id="f-output" maxlength="40" placeholder="例：報價比較表"></label>
     <div class="two">
-      <label>負責組別<select id="f-role"></select></label>
+      <label>負責位子<select id="f-role"></select></label>
       <label>預估時數（小時）<input id="f-hours" type="number" min="0" step="0.5" placeholder="可先空著"></label>
     </div>
     <div class="two">
@@ -301,7 +301,7 @@
 // ── GAS 網址 ──
 var DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbz05Z9JAW6zQRK_vkA1QUzmGkbI1MLG2WuxVPM_RCENx7nGE7-bJTMKIUWjoPNSjpYiZw/exec";
 // ── 展示模式用的初始資料（由 xlsx 匯出） ──
-var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認主責、協辦、代理人、回報頻率與文件存放位置","output":"活動組工作分配表","role":"統籌","person":"","hours":"","start":"2026-09-22","end":"2026-09-25","pre":"—","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A02","name":"建立活動組工作清單","detail":"將活動組職掌拆成流程、遊戲、主持、場控及文件等工作包","output":"工作分解表（WBS）","role":"統籌","person":"","hours":"","start":"2026-09-22","end":"2026-09-29","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A03","name":"蒐集歷年尾牙資料","detail":"整理歷年活動流程、遊戲、主持稿、場控表及問題紀錄","output":"歷年資料彙整表","role":"全組","person":"","hours":"","start":"2026-09-28","end":"2026-10-02","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A04","name":"確認活動需求與限制","detail":"確認參加人數、活動長度、長官致詞、頒獎、抽獎及場地限制","output":"需求與限制清單","role":"統籌","person":"","hours":"","start":"2026-09-28","end":"2026-10-07","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A05","name":"確認活動目標與主題方向","detail":"依企劃組方向轉化為活動氣氛、互動原則與舞台概念","output":"活動主軸說明","role":"統籌","person":"","hours":"","start":"2026-10-01","end":"2026-10-09","pre":"A04","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A06","name":"規劃活動整體架構","detail":"安排開場、致詞、用餐、頒獎、互動、抽獎及閉幕段落","output":"活動架構圖","role":"統籌","person":"","hours":"","start":"2026-10-05","end":"2026-10-14","pre":"A04,A05","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A07","name":"提出互動活動方案","detail":"提出至少2套遊戲或互動方案，包含規則、時間、人力及風險","output":"活動方案提案","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-10-08","end":"2026-10-23","pre":"A05,A06","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A08","name":"設計遊戲規則與計分方式","detail":"完成參加方式、分組、計分、勝負判定及公平性檢核","output":"遊戲規則文件","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-10-15","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A09","name":"規劃獎項與抽獎流程","detail":"確認遊戲獎項、抽獎銜接、領獎方式及備用方案","output":"獎項與抽獎流程表","role":"餐會活動組","person":"","hours":"","start":"2026-10-19","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A10","name":"製作活動流程初稿","detail":"將各段落整合為含時間、內容、窗口及設備需求的流程表","output":"活動流程初稿","role":"全組","person":"","hours":"","start":"2026-10-26","end":"2026-11-06","pre":"A06,A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A11","name":"盤點跨組協作需求","detail":"彙整設計、採購、場佈音效、影像及行政所需配合事項","output":"跨組需求清單","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-11-02","end":"2026-11-11","pre":"A10","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A12","name":"確認場地流程與動線","detail":"依場地平面、舞台、餐桌及設備位置調整進退場與活動動線","output":"場地動線需求表","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-11-05","end":"2026-11-17","pre":"A10,A11","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A13","name":"活動方案審查與定案","detail":"確認最終流程、遊戲、獎項、時間及備案","output":"活動方案定案紀錄","role":"統籌","person":"","hours":"","start":"2026-11-16","end":"2026-11-20","pre":"A10,A11,A12","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A14","name":"確認主持人配置","detail":"確認主持人、代班人選、主持分工及溝通方式","output":"主持人確認表","role":"統籌","person":"","hours":"","start":"2026-11-23","end":"2026-12-02","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A15","name":"撰寫開場與串場稿","detail":"完成開場、長官介紹、流程轉場及氣氛帶動稿","output":"主持稿第一版","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-11-26","end":"2026-12-11","pre":"A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A16","name":"撰寫頒獎與抽獎稿","detail":"完成頒獎名單銜接、抽獎規則、得獎宣告及領獎提醒","output":"頒獎抽獎稿","role":"餐會活動組","person":"","hours":"","start":"2026-12-01","end":"2026-12-15","pre":"A09,A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A17","name":"建立工作人員執行表","detail":"列出各時段工作、集合時間、站位、聯絡方式及交接事項","output":"工作人員執行表","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-12-03","end":"2026-12-16","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A18","name":"建立場控Cue表","detail":"列出音樂、影片、燈光、主持、道具及工作人員Cue點","output":"場控Cue表","role":"全組","person":"","hours":"","start":"2026-12-10","end":"2026-12-24","pre":"A15,A16,A17","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A19","name":"建立道具與備品清單","detail":"列出遊戲道具、獎品、抽獎用品、文具及備品數量","output":"道具備品清單","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2026-12-10","end":"2026-12-24","pre":"A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A20","name":"完成跨組文件確認","detail":"與設計、採購、場佈音效、影像組確認版本及交付期限","output":"跨組確認紀錄","role":"統籌","person":"","hours":"","start":"2026-12-21","end":"2026-12-30","pre":"A11,A18,A19","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A21","name":"第一次流程演練","detail":"以桌上推演檢查流程長度、轉場、規則及人力缺口","output":"流程演練紀錄","role":"全組","person":"","hours":"","start":"2027-01-04","end":"2027-01-08","pre":"A18,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A22","name":"修正流程與主持稿","detail":"依演練結果修訂時間、台詞、Cue點及備案","output":"流程與主持稿第二版","role":"全組","person":"","hours":"","start":"2027-01-11","end":"2027-01-15","pre":"A21","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A23","name":"確認活動前物資到位","detail":"檢查道具、獎品、文件及備品數量與存放位置","output":"物資檢查表","role":"戶外活動組、餐會活動組","person":"","hours":"","start":"2027-01-18","end":"2027-01-22","pre":"A19,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A24","name":"總彩排與最終確認","detail":"完整走台、主持、遊戲、頒獎、抽獎及技術銜接","output":"總彩排紀錄、最終版Run Down","role":"全組","person":"","hours":"","start":"2027-01-25","end":"2027-01-27","pre":"A22,A23","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A25","name":"活動當日執行","detail":"完成現場場控、流程控制、道具調度、臨場應變及收尾","output":"活動執行紀錄","role":"全組","person":"","hours":"","start":"2027-01-29","end":"2027-01-29","pre":"A24","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A26","name":"活動後檢討與結案","detail":"彙整問題、建議、照片影片交接及文件歸檔","output":"檢討報告、結案資料","role":"統籌","person":"","hours":"","start":"2027-01-30","end":"2027-02-05","pre":"A25","status":"未開始","pct":0,"note":"","by":"","at":""}],"roles":[{"role":"統籌","duty":"活動整體架構與方案定案；進度管理與甘特圖維護；備案（含天候）決策；主持人配置；各段落講稿與場控Cue表整合；跨組文件版本確認；代表活動組進籌備會；活動當日總場控","note":"協辦：全組｜代理人：戶外活動組｜甘特圖 A01–A06、A10、A13、A14、A18、A20–A22、A24–A26"},{"role":"戶外活動組","duty":"戶外活動的遊戲設計、規則、分組與計分方式；戶外段落主持稿與流程表；備案版本的內容調整；場地窗口與預約；場勘與動線；工作人員招募、說明與執行表；戶外段落道具備品清單；當日戶外現場場控","note":"2 人分攤：一人偏內容、一人偏執行，互為代理人｜甘特圖 A07、A08、A11、A12、A15、A17、A19、A22、A23（戶外段）"},{"role":"餐會活動組","duty":"餐會流程、互動遊戲設計與規則；獎項與抽獎流程；餐會段落主持稿（開場、串場、頒獎、抽獎）；餐會場地需求與動線；與採購、場佈音效、設計、影像組的協作需求彙整；餐會段落Cue表與道具備品清單；當日餐會現場場控","note":"2 人分攤：一人偏內容、一人偏執行，互為代理人｜甘特圖 A07、A09、A11、A12、A15、A16、A18、A19、A22、A23（餐會段）"}]};
+var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認主責、協辦、代理人、回報頻率與文件存放位置","output":"活動組工作分配表","role":"統籌","person":"Jim","hours":"","start":"2026-09-22","end":"2026-09-25","pre":"—","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A02","name":"建立活動組工作清單","detail":"將活動組職掌拆成流程、遊戲、主持、場控及文件等工作包","output":"工作分解表（WBS）","role":"統籌","person":"Jim","hours":"","start":"2026-09-22","end":"2026-09-29","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A03","name":"蒐集歷年尾牙資料","detail":"整理歷年活動流程、遊戲、主持稿、場控表及問題紀錄","output":"歷年資料彙整表","role":"統籌","person":"Jim","hours":"","start":"2026-09-28","end":"2026-10-02","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A04","name":"確認活動需求與限制","detail":"確認參加人數、活動長度、長官致詞、頒獎、抽獎及場地限制","output":"需求與限制清單","role":"統籌","person":"Jim","hours":"","start":"2026-09-28","end":"2026-10-07","pre":"A01","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A05","name":"確認活動目標與主題方向","detail":"依企劃組方向轉化為活動氣氛、互動原則與舞台概念","output":"活動主軸說明","role":"統籌","person":"Jim","hours":"","start":"2026-10-01","end":"2026-10-09","pre":"A04","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A06","name":"規劃活動整體架構","detail":"安排開場、致詞、用餐、頒獎、互動、抽獎及閉幕段落","output":"活動架構圖","role":"統籌","person":"Jim","hours":"","start":"2026-10-05","end":"2026-10-14","pre":"A04,A05","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A07","name":"提出互動活動方案","detail":"提出至少2套遊戲或互動方案，包含規則、時間、人力及風險","output":"活動方案提案","role":"戶外活動內容、餐會活動內容","person":"小周、小P","hours":"","start":"2026-10-08","end":"2026-10-23","pre":"A05,A06","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A08","name":"設計遊戲規則與計分方式","detail":"完成參加方式、分組、計分、勝負判定及公平性檢核","output":"遊戲規則文件","role":"戶外活動內容、餐會活動內容","person":"小周、小P","hours":"","start":"2026-10-15","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A09","name":"規劃獎項與抽獎流程","detail":"確認遊戲獎項、抽獎銜接、領獎方式及備用方案","output":"獎項與抽獎流程表","role":"餐會活動內容","person":"小P","hours":"","start":"2026-10-19","end":"2026-10-30","pre":"A07","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A10","name":"製作活動流程初稿","detail":"將各段落整合為含時間、內容、窗口及設備需求的流程表","output":"活動流程初稿","role":"統籌","person":"Jim","hours":"","start":"2026-10-26","end":"2026-11-06","pre":"A06,A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A11","name":"盤點跨組協作需求","detail":"彙整設計、採購、場佈音效、影像及行政所需配合事項","output":"跨組需求清單","role":"戶外活動執行、餐會活動執行","person":"小恩、大魚","hours":"","start":"2026-11-02","end":"2026-11-11","pre":"A10","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A12","name":"確認場地流程與動線","detail":"依場地平面、舞台、餐桌及設備位置調整進退場與活動動線","output":"場地動線需求表","role":"戶外活動執行、餐會活動執行","person":"小恩、大魚","hours":"","start":"2026-11-05","end":"2026-11-17","pre":"A10,A11","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A13","name":"活動方案審查與定案","detail":"確認最終流程、遊戲、獎項、時間及備案","output":"活動方案定案紀錄","role":"統籌","person":"Jim","hours":"","start":"2026-11-16","end":"2026-11-20","pre":"A10,A11,A12","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A14","name":"確認主持人配置","detail":"確認主持人、代班人選、主持分工及溝通方式","output":"主持人確認表","role":"統籌","person":"Jim","hours":"","start":"2026-11-23","end":"2026-12-02","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A15","name":"撰寫開場與串場稿","detail":"完成開場、長官介紹、流程轉場及氣氛帶動稿","output":"主持稿第一版","role":"戶外活動內容、餐會活動內容","person":"小周、小P","hours":"","start":"2026-11-26","end":"2026-12-11","pre":"A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A16","name":"撰寫頒獎與抽獎稿","detail":"完成頒獎名單銜接、抽獎規則、得獎宣告及領獎提醒","output":"頒獎抽獎稿","role":"餐會活動內容","person":"小P","hours":"","start":"2026-12-01","end":"2026-12-15","pre":"A09,A14","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A17","name":"建立工作人員執行表","detail":"列出各時段工作、集合時間、站位、聯絡方式及交接事項","output":"工作人員執行表","role":"戶外活動執行、餐會活動執行","person":"小恩、大魚","hours":"","start":"2026-12-03","end":"2026-12-16","pre":"A13","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A18","name":"建立場控Cue表","detail":"列出音樂、影片、燈光、主持、道具及工作人員Cue點","output":"場控Cue表","role":"統籌","person":"Jim","hours":"","start":"2026-12-10","end":"2026-12-24","pre":"A15,A16,A17","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A19","name":"建立道具與備品清單","detail":"列出遊戲道具、獎品、抽獎用品、文具及備品數量","output":"道具備品清單","role":"戶外活動執行、餐會活動執行","person":"小恩、大魚","hours":"","start":"2026-12-10","end":"2026-12-24","pre":"A08,A09","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A20","name":"完成跨組文件確認","detail":"與設計、採購、場佈音效、影像組確認版本及交付期限","output":"跨組確認紀錄","role":"統籌","person":"Jim","hours":"","start":"2026-12-21","end":"2026-12-30","pre":"A11,A18,A19","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A21","name":"第一次流程演練","detail":"以桌上推演檢查流程長度、轉場、規則及人力缺口","output":"流程演練紀錄","role":"全組","person":"Jim、小周、小恩、小P、大魚","hours":"","start":"2027-01-04","end":"2027-01-08","pre":"A18,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A22","name":"修正流程與主持稿","detail":"依演練結果修訂時間、台詞、Cue點及備案","output":"流程與主持稿第二版","role":"統籌＋內容","person":"Jim、小周、小P","hours":"","start":"2027-01-11","end":"2027-01-15","pre":"A21","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A23","name":"確認活動前物資到位","detail":"檢查道具、獎品、文件及備品數量與存放位置","output":"物資檢查表","role":"戶外活動執行、餐會活動執行","person":"小恩、大魚","hours":"","start":"2027-01-18","end":"2027-01-22","pre":"A19,A20","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A24","name":"總彩排與最終確認","detail":"完整走台、主持、遊戲、頒獎、抽獎及技術銜接","output":"總彩排紀錄、最終版Run Down","role":"全組","person":"Jim、小周、小恩、小P、大魚","hours":"","start":"2027-01-25","end":"2027-01-27","pre":"A22,A23","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A25","name":"活動當日執行","detail":"完成現場場控、流程控制、道具調度、臨場應變及收尾","output":"活動執行紀錄","role":"全組","person":"Jim、小周、小恩、小P、大魚","hours":"","start":"2027-01-29","end":"2027-01-29","pre":"A24","status":"未開始","pct":0,"note":"","by":"","at":""},{"id":"A26","name":"活動後檢討與結案","detail":"彙整問題、建議、照片影片交接及文件歸檔","output":"檢討報告、結案資料","role":"統籌","person":"Jim","hours":"","start":"2027-01-30","end":"2027-02-05","pre":"A25","status":"未開始","pct":0,"note":"","by":"","at":""}],"roles":[{"role":"統籌","duty":"活動整體架構與方案定案；進度管理與甘特圖維護；備案（含天候）決策；主持人配置；各段落講稿與場控Cue表整合；跨組文件版本確認；代表活動組進籌備會；活動當日總場控","note":"協辦：全組｜代理人：戶外活動執行｜甘特圖 A01–A06、A10、A13、A14、A18、A20–A22、A24–A26","person":"Jim"},{"role":"戶外活動 內容","duty":"戶外活動的遊戲設計、規則、分組與計分方式；戶外段落主持稿與流程表；備案版本的內容調整","note":"協辦／代理人：戶外活動執行｜甘特圖 A07、A08、A15（戶外段）、A22","person":"小周"},{"role":"戶外活動 執行","duty":"場地窗口與預約；場勘與動線；工作人員招募、說明與執行表；戶外段落道具備品清單；當日戶外現場場控","note":"協辦／代理人：戶外活動內容｜甘特圖 A11、A12、A17、A19、A23（戶外段）","person":"小恩"},{"role":"餐會活動 內容","duty":"餐會流程、互動遊戲設計與規則；獎項與抽獎流程；餐會段落主持稿（開場、串場、頒獎、抽獎）","note":"協辦／代理人：餐會活動執行｜甘特圖 A07、A09、A15、A16（餐會段）、A22","person":"小P"},{"role":"餐會活動 執行","duty":"餐會場地需求與動線；與採購、場佈音效、設計、影像組的協作需求彙整；餐會段落Cue表與道具備品清單；當日餐會現場場控","note":"協辦／代理人：餐會活動內容｜甘特圖 A11、A12、A18、A19、A23（餐會段）","person":"大魚"}]};
 
 (function(){
   var KEY = 'weiya2027_progress_';
@@ -388,7 +388,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(!demo) return jsonp({ action:'delete', id:t.id, by:t.by });
     state.tasks=state.tasks.filter(function(x){ return x!==t; }); return demoResp();
   }
-  function seatsOf(role){ return /組$/.test(String(role).replace(/\s/g,'')) && role!=='全組' ? 2 : 1; }
+  function seatsOf(role){ return 1; }
   function splitNames(p){ return String(p||'').split(/[、,，\/ ]+/).filter(Boolean); }
   function pushAssign(role, person){
     if(!demo) return jsonp({ action:'assign', role:role, person:person });
@@ -422,7 +422,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function hoursOf(t){ return Number(t.hours)||0; }
   function totalHours(){ return state.tasks.reduce(function(a,t){ return a+hoursOf(t); },0); }
   function weightOf(t){ return totalHours()>0 ? hoursOf(t) : 1; }
-  function ownerCount(t){ var ks=roleKeys(t); return Math.max(1, ks.indexOf('全組')>=0 ? state.roles.length : ks.length); }
+  function ownerCount(t){ return Math.max(1, state.roles.filter(function(r){ return roleMatch(t, r.role); }).length); }
   function shareWeight(t){ return weightOf(t) / ownerCount(t); }
   function roleHours(role){ var h=0; state.tasks.forEach(function(t){ if(roleMatch(t, role)) h+=hoursOf(t)/ownerCount(t); }); return h; }
   function weeksLeft(){ return Math.max(1, (EVENT - today())/86400000/7); }
@@ -490,7 +490,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<div class="who">負責人：'+(names.length ? '<b>'+esc(names.join('、'))+'</b>' : '<span class="na">待填'+(seats>1?'（'+seats+' 人）':'')+'</span>')+'</div>'
         + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
         + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x){ return !/^甘特圖/.test(x); }).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
-        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這組的工作</button></div>'
+        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這位子的工作</button></div>'
         + '<div class="assign">'+Array.apply(null,{length:seats}).map(function(_,i){ return '<input placeholder="'+(seats>1?'負責人 '+(i+1):'填負責人名字')+'" maxlength="12" value="'+esc(names[i]||'')+'">'; }).join('')+'<button class="btn primary">儲存</button><span class="msg"></span></div>';
       if(r.role.replace(/\s/g,'')==='統籌') el.querySelector('.top b').addEventListener('dblclick', openHoursDlg);
       var inps=el.querySelectorAll('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
@@ -687,17 +687,14 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function openHoursDlg(){
     var wk=weeksLeft(), per={}, order=[];
     function add(name, h, na){ if(!per[name]){ per[name]={h:0,n:0,na:!!na}; order.push(name); } per[name].h+=h; per[name].n++; }
-    var roleP={}; state.roles.forEach(function(r){ roleP[r.role.replace(/\s/g,'')]={ names:splitNames(r.person), seats:seatsOf(r.role), role:r.role }; });
     state.tasks.forEach(function(t){
       var h=hoursOf(t); if(!h) return;
-      var ks=roleKeys(t), keys=ks.indexOf('全組')>=0 ? Object.keys(roleP) : ks.map(function(k){ return k.replace(/（.*?）/g,''); }).filter(function(k){ return roleP[k]; });
-      if(!keys.length){ add('未指派位子', h, true); return; }
-      keys.forEach(function(k){
-        var g=roleP[k], share=h/keys.length;
-        if(!g.names.length){ add('未指派（'+g.role+'）', share, true); return; }
-        var n=Math.max(g.names.length, g.seats);
-        g.names.forEach(function(nm){ add(nm, share/n); });
-        if(g.names.length<g.seats) add('未指派（'+g.role+' 第 '+(g.names.length+1)+' 人）', share/n*(g.seats-g.names.length), true);
+      var rs=state.roles.filter(function(r){ return roleMatch(t, r.role); });
+      if(!rs.length){ add('未指派位子', h, true); return; }
+      rs.forEach(function(r){
+        var names=splitNames(r.person), share=h/rs.length;
+        if(!names.length){ add('未指派（'+r.role+'）', share, true); return; }
+        names.forEach(function(nm){ add(nm, share/names.length); });
       });
     });
     var TH=totalHours();
