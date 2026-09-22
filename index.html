@@ -25,11 +25,10 @@
 
   /* ── 頁首 ── */
   header{background:linear-gradient(135deg,#2B5C8A 0,#1F4566 100%);color:#fff;box-shadow:0 2px 10px rgba(20,40,70,.3);position:sticky;top:0;z-index:20}
-  header .in{max-width:1400px;margin:0 auto;padding:16px 20px 0;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;text-align:center}
-  header .in > div:first-child{flex-basis:100%}
-  header h1{font-size:28px;letter-spacing:.06em}
-  header .sub{font-size:14px;opacity:.9;margin-top:4px}
-  header .sp{display:none}
+  header .in{max-width:1400px;margin:0 auto;padding:12px 20px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:24px;letter-spacing:.06em;line-height:1.2}
+  header .sub{font-size:13px;opacity:.9;margin-top:2px}
+  header .sp{flex:1}
   .badge{font-size:12.5px;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);white-space:nowrap}
   .badge.demo{background:var(--gold);color:var(--ink);border-color:var(--gold)}
   .me{display:flex;align-items:center;gap:8px;font-size:13.5px;white-space:nowrap}
@@ -40,7 +39,7 @@
   .btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
   .btn.danger{color:var(--s-late);border-color:var(--s-late);background:#fff}
   .btn.danger:hover{background:#FFF3F1}
-  nav.tabs{max-width:1400px;margin:12px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
+  nav.tabs{max-width:1400px;margin:6px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{background:transparent;border:0;color:rgba(255,255,255,.88);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
   nav.tabs button:hover{color:#fff}
@@ -193,7 +192,7 @@
   .ptable th:first-child,.ptable td:first-child{text-align:left}
   .ptable th{background:#E8F0F8;color:var(--red-dk);position:static}
   .ptable tr.na td{color:var(--ink-3)}
-  @media (max-width:640px){header h1{font-size:20px}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
+  @media (max-width:640px){header h1{font-size:20px}header .sp{display:none}header .in > div:first-child{flex-basis:100%}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
 </style>
 </head>
 <body>
