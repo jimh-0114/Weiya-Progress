@@ -38,6 +38,8 @@
   .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
   .btn.ghost:hover{background:rgba(255,255,255,.12)}
   .btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
+  .btn.danger{color:var(--s-late);border-color:var(--s-late);background:#fff}
+  .btn.danger:hover{background:#FFF3F1}
   nav.tabs{max-width:1400px;margin:12px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
   nav.tabs button{background:transparent;border:0;color:rgba(255,255,255,.88);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
@@ -119,8 +121,8 @@
   .twrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
   table{border-collapse:collapse;width:100%;font-size:15px;min-width:1300px;table-layout:fixed}
   th,td{padding:14px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle;text-align:center}
-  td:nth-child(2){text-align:left}
-  td:nth-child(2) .name{line-height:1.5}
+  td:first-child{text-align:left}
+  td:first-child .name{line-height:1.5}
   td .by{white-space:normal}
   th{background:#E8F0F8;color:var(--red-dk);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
   tr:last-child td{border-bottom:none}
@@ -155,11 +157,11 @@
   /* 時程 */
   .gwrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px 18px;box-shadow:var(--shadow)}
   .gantt{min-width:960px;position:relative}
-  .g-months{height:26px;font-size:13.5px;color:var(--ink-2);border-bottom:1px solid var(--line);position:relative;margin-left:190px}
+  .g-months{height:26px;font-size:13.5px;color:var(--ink-2);border-bottom:1px solid var(--line);position:relative;margin-left:220px}
   .g-months span{position:absolute;top:3px;border-left:1px solid var(--line);padding-left:6px;height:22px}
   .g-body{position:relative}
   .g-row{display:flex;align-items:center;height:32px}
-  .g-row .lab{width:190px;flex:none;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;text-align:left}
+  .g-row .lab{width:220px;flex:none;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:10px;text-align:left}
   .g-row .track.nodate{background:repeating-linear-gradient(90deg,var(--line-2) 0,var(--line-2) 6px,transparent 6px,transparent 12px)}
   .g-row .track.nodate:after{content:"尚未排定日期";font-size:12px;color:var(--ink-3);position:absolute;left:8px;top:-2px}
   .g-row .lab b{color:var(--red);margin-right:4px}
@@ -185,7 +187,7 @@
   dialog .frm input,dialog .frm textarea,dialog .frm select{display:block;width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:15px}
   dialog .frm .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   dialog .msg{min-height:20px;font-size:13.5px}
-  dialog .row{display:flex;gap:8px;justify-content:center;margin-top:8px}
+  dialog .row{display:flex;gap:8px;justify-content:center;margin-top:8px;align-items:center}
   .ptable{width:100%;min-width:0;border-collapse:collapse;font-size:14.5px;margin-bottom:12px;table-layout:auto}
   .ptable th,.ptable td{padding:8px 10px;border-bottom:1px solid var(--line-2);text-align:right;white-space:nowrap}
   .ptable th:first-child,.ptable td:first-child{text-align:left}
@@ -240,18 +242,18 @@
 
   <!-- 填進度 -->
   <section class="page" id="page-tasks">
-    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、預估時數、狀態、完成％或備註後會自動存檔</span></div>
+    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、預估時數、狀態、完成％或備註後會自動存檔。工作依預計完成日排序，還沒排日期的在最後</span></div>
     <div class="filters" id="filters">
       <button class="chip on" data-role="">全部</button>
       <span class="sp"></span>
-      <label><input type="checkbox" id="showMore"> 顯示產出與前置</label>
+      <label><input type="checkbox" id="showMore"> 顯示產出</label>
       <label><input type="checkbox" id="hideDone"> 隱藏已完成</label>
       <button class="btn primary" id="addTask">＋ 新增工作</button>
     </div>
     <div class="twrap"><table id="taskTable">
-      <colgroup><col style="width:60px"><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
+      <colgroup><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
       <thead><tr>
-        <th>編號</th><th>工作項目</th><th>負責</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
+        <th>工作項目</th><th>負責</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
@@ -283,7 +285,7 @@
     </div>
     <div class="msg" id="f-msg"></div>
   </div>
-  <div class="row"><button class="btn" id="taskCancel">取消</button><button class="btn primary" id="taskSave">儲存</button></div>
+  <div class="row"><button class="btn danger" id="taskDelete" type="button">刪除這項工作</button><span style="flex:1"></span><button class="btn" id="taskCancel">取消</button><button class="btn primary" id="taskSave">儲存</button></div>
 </dialog>
 
 <dialog id="hoursDlg">
@@ -327,6 +329,17 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     t.status = t.status || '未開始';
     return t;
   }
+  function setTasks(list){
+    state.tasks = (list||[]).map(normTask);
+    state.tasks.forEach(function(t,i){ t._i=i; });
+    state.tasks.sort(function(a,b){
+      var ae=a.endD?a.endD.getTime():Infinity, be=b.endD?b.endD.getTime():Infinity;
+      if(ae!==be) return ae<be?-1:1;
+      var as_=a.startD?a.startD.getTime():Infinity, bs=b.startD?b.startD.getTime():Infinity;
+      if(as_!==bs) return as_<bs?-1:1;
+      return a._i-b._i;
+    });
+  }
   function today(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
   function fmt(x){ return x ? (x.getMonth()+1)+'/'+x.getDate() : '—'; }
   function fmtFull(x){ return x ? x.getFullYear()+'/'+(x.getMonth()+1)+'/'+x.getDate()+'（'+'日一二三四五六'[x.getDay()]+'）' : '—'; }
@@ -348,39 +361,32 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       document.head.appendChild(s);
     });
   }
+  // 展示模式：整包工作清單存在這台電腦
+  function plain(t){ var c=Object.assign({},t); delete c.startD; delete c.endD; delete c._i; c.start=iso(t.startD); c.end=iso(t.endD); return c; }
   function loadLocal(){
-    var saved = null; try{ saved = JSON.parse(ls('demo') || 'null'); }catch(e){}
+    var tasks=null; try{ tasks=JSON.parse(ls('tasks')||'null'); }catch(e){}
     var base = JSON.parse(JSON.stringify(SEED));
-    var extra=[]; try{ extra=JSON.parse(ls('extra')||'[]'); }catch(e){}
-    extra.forEach(function(x){ base.tasks.push(x); });
-    if(saved){ base.tasks.forEach(function(t){ if(saved[t.id]) Object.assign(t, saved[t.id]); }); }
     var rs={}; try{ rs=JSON.parse(ls('roles')||'{}'); }catch(e){}
     base.roles.forEach(function(r){ var k=r.role.replace(/\s/g,''); if(rs[k]) r.person=rs[k]; });
-    return Promise.resolve({ ok:true, tasks: base.tasks, roles: base.roles, serverTime: '展示模式' });
+    return Promise.resolve({ ok:true, tasks: tasks||base.tasks, roles: base.roles, serverTime: '展示模式' });
   }
-  function saveLocal(t){
-    var saved = {}; try{ saved = JSON.parse(ls('demo') || '{}'); }catch(e){}
-    saved[t.id] = { status:t.status, pct:t.pct, note:t.note, hours:t.hours, by:t.by, at:t.at, start:iso(t.startD), end:iso(t.endD) };
-    ls('demo', JSON.stringify(saved));
-    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+  function demoResp(){
+    state.tasks.forEach(function(t){ t.person=personsForTask(t); });
+    ls('tasks', JSON.stringify(state.tasks.map(plain)));
+    return Promise.resolve({ ok:true, tasks: state.tasks.map(plain), roles: state.roles, serverTime:'展示模式' });
   }
   function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
-  function pushUpdate(t){ return demo ? saveLocal(t) : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, hours:t.hours==null?'':t.hours, by:t.by, start:iso(t.startD), end:iso(t.endD) }); }
-  function pushEdit(t){
-    if(!demo) return jsonp({ action:'edit', id:t.id, name:t.name, detail:t.detail, output:t.output, role:t.role, hours:t.hours==null?'':t.hours, start:iso(t.startD), end:iso(t.endD), by:t.by });
-    var saved={}; try{ saved=JSON.parse(ls('demo')||'{}'); }catch(e){}
-    saved[t.id]=Object.assign(saved[t.id]||{}, { name:t.name, detail:t.detail, output:t.output, role:t.role, hours:t.hours, start:iso(t.startD), end:iso(t.endD), by:t.by, at:t.at });
-    ls('demo', JSON.stringify(saved)); t.person=personsForTask(t);
-    return Promise.resolve({ ok:true, serverTime:'展示模式' });
-  }
+  function pushUpdate(t){ return demo ? demoResp() : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, hours:t.hours==null?'':t.hours, by:t.by, start:iso(t.startD), end:iso(t.endD) }); }
+  function pushEdit(t){ return demo ? demoResp() : jsonp({ action:'edit', id:t.id, name:t.name, detail:t.detail, output:t.output, role:t.role, hours:t.hours==null?'':t.hours, start:iso(t.startD), end:iso(t.endD), by:t.by }); }
   function pushAdd(t){
     if(!demo) return jsonp({ action:'add', name:t.name, detail:t.detail, output:t.output, role:t.role, hours:t.hours==null?'':t.hours, start:t.start, end:t.end, by:t.by });
-    var extra=[]; try{ extra=JSON.parse(ls('extra')||'[]'); }catch(e){}
     var maxNo=0; state.tasks.forEach(function(x){ var m=/^A(\d+)$/.exec(x.id); if(m) maxNo=Math.max(maxNo,+m[1]); });
-    t.id='A'+('0'+(maxNo+1)).slice(-2); t.status='未開始'; t.pct=0; t.note=''; t.pre='—';
-    extra.push(t); ls('extra', JSON.stringify(extra));
-    state.tasks.push(normTask(JSON.parse(JSON.stringify(t)))); state.tasks[state.tasks.length-1].person=personsForTask(t);
-    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+    t.id='A'+(maxNo+1<10?'0':'')+(maxNo+1); t.status='未開始'; t.pct=0; t.note=''; t.pre='—';
+    state.tasks.push(normTask(t)); return demoResp();
+  }
+  function pushDelete(t){
+    if(!demo) return jsonp({ action:'delete', id:t.id, by:t.by });
+    state.tasks=state.tasks.filter(function(x){ return x!==t; }); return demoResp();
   }
   function seatsOf(role){ return /組$/.test(String(role).replace(/\s/g,'')) && role!=='全組' ? 2 : 1; }
   function splitNames(p){ return String(p||'').split(/[、,，\/ ]+/).filter(Boolean); }
@@ -390,8 +396,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var saved={}; try{ saved=JSON.parse(ls('roles')||'{}'); }catch(e){}
     saved[role.replace(/\s/g,'')]=person; ls('roles', JSON.stringify(saved));
     state.roles.forEach(function(r){ if(r.role.replace(/\s/g,'')===role.replace(/\s/g,'')) r.person=person; });
-    state.tasks.forEach(function(t){ t.person = personsForTask(t); });
-    return Promise.resolve({ ok:true, serverTime:'展示模式' });
+    return demoResp();
   }
   function personsForTask(t){
     var map={}; state.roles.forEach(function(r){ map[r.role.replace(/\s/g,'')]=r.person||''; });
@@ -452,13 +457,13 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     $('ov-roles').innerHTML = state.roles.map(function(r){ var p=rolePct(r.role); return '<li><span>'+esc(r.role)+'</span><div class="bar"><i style="width:'+p+'%"></i></div><span class="pct">'+p+'%</span></li>'; }).join('') || '<li class="empty">—</li>';
 
     var due = ts.filter(function(t){ return t.status!=='已完成' && t.endD; }).sort(function(a,b){ return a.endD-b.endD; }).slice(0,6);
-    $('ov-due').innerHTML = due.map(function(t){ var l=isLate(t); return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+'</span><span class="when '+(l?'late':'')+'">'+fmt(t.endD)+' · '+esc(leftText(t))+'</span></li>'; }).join('') || '<li class="empty">全部完成</li>';
+    $('ov-due').innerHTML = due.map(function(t){ var l=isLate(t); return '<li><span>'+esc(t.name)+'</span><span class="when '+(l?'late':'')+'">'+fmt(t.endD)+' · '+esc(leftText(t))+'</span></li>'; }).join('') || '<li class="empty">全部完成</li>';
 
     var dg = ts.filter(function(t){ return t.status==='進行中'; });
-    $('ov-doing').innerHTML = dg.map(function(t){ return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+(t.person?' · '+esc(t.person):'')+'</span><span class="when">'+effPct(t)+'%</span></li>'; }).join('') || '<li class="empty">目前沒有進行中的項目</li>';
+    $('ov-doing').innerHTML = dg.map(function(t){ return '<li><span>'+esc(t.name)+(t.person?' · '+esc(t.person):'')+'</span><span class="when">'+effPct(t)+'%</span></li>'; }).join('') || '<li class="empty">目前沒有進行中的項目</li>';
 
     var rc = ts.filter(function(t){ return t.at; }).sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); }).slice(0,6);
-    $('ov-recent').innerHTML = rc.map(function(t){ return '<li><span class="id">'+esc(t.id)+'</span><span>'+esc(t.name)+' → '+esc(t.status)+' '+effPct(t)+'%</span><span class="when">'+esc(t.by)+' '+esc(String(t.at).slice(5,16))+'</span></li>'; }).join('') || '<li class="empty">還沒有人更新</li>';
+    $('ov-recent').innerHTML = rc.map(function(t){ return '<li><span>'+esc(t.name)+' → '+esc(t.status)+' '+effPct(t)+'%</span><span class="when">'+esc(t.by)+' '+esc(String(t.at).slice(5,16))+'</span></li>'; }).join('') || '<li class="empty">還沒有人更新</li>';
   }
 
   // ── 分工比例 ──
@@ -494,7 +499,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         am.innerHTML='<span class="saving">儲存中…</span>'; sbtn.disabled=true;
         pushAssign(r.role, v).then(function(res){
           if(res.roles) state.roles=res.roles;
-          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          if(res.tasks) setTasks(res.tasks);
           state.serverTime=res.serverTime||state.serverTime; renderAll();
         }).catch(function(err){ am.innerHTML='<span class="err">'+esc(err.message)+'</span>'; sbtn.disabled=false; });
       }
@@ -514,8 +519,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       var late = isLate(t);
       var tr = document.createElement('tr'); tr.className = (late?'late ':'')+(t.status==='已完成'?'done':'');
       tr.innerHTML =
-        '<td class="id">'+esc(t.id)+'</td>'
-        + '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+(t.pre&&t.pre!=='—'?'　前置：'+esc(t.pre):'')+'</div><button class="edit" type="button">修改</button></td>'
+        '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+'</div><button class="edit" type="button">修改</button></td>'
         + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
         + '<td><span class="hours"><input class="hrs" type="number" min="0" step="0.5" value="'+esc(t.hours===''||t.hours==null?'':t.hours)+'" placeholder="自填"> 小時</span></td>'
         + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
@@ -534,7 +538,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         normTask(t);
         msg.innerHTML='<span class="saving">儲存中…</span>';
         pushUpdate(t).then(function(res){
-          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          if(res.tasks) setTasks(res.tasks);
           state.serverTime=res.serverTime||state.serverTime; renderAll();
         }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
       }
@@ -551,7 +555,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         sel.className='status '+t.status;
         msg.innerHTML='<span class="saving">儲存中…</span>';
         pushUpdate(t).then(function(res){
-          if(res.tasks){ var by={}; res.tasks.forEach(function(x){ by[x.id]=x; }); state.tasks.forEach(function(x){ if(by[x.id]) normTask(Object.assign(x, by[x.id])); }); }
+          if(res.tasks) setTasks(res.tasks);
           state.serverTime = res.serverTime || state.serverTime;
           renderAll();
         }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
@@ -562,7 +566,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       note.addEventListener('blur', function(){ if(note.value !== (t.note||'')) commit(); });
       tb.appendChild(tr);
     });
-    if(!tb.children.length) tb.innerHTML='<tr><td colspan="9" class="empty" style="text-align:center;padding:28px">沒有符合的項目</td></tr>';
+    if(!tb.children.length) tb.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:28px">沒有符合的項目</td></tr>';
   }
 
   // ── 時程 ──
@@ -577,18 +581,18 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     state.tasks.forEach(function(t){
       if(filterRole && !roleMatch(t, filterRole)) return;
       var row=document.createElement('div'); row.className='g-row';
-      if(!t.startD || !t.endD){ row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track nodate"></div>'; body.appendChild(row); return; }
+      if(!t.startD || !t.endD){ row.innerHTML='<div class="lab" title="'+esc(t.name)+'">'+esc(t.name)+'</div><div class="track nodate"></div>'; body.appendChild(row); return; }
       var e=new Date(t.endD); e.setDate(e.getDate()+1);
       var l=Math.max(0,(t.startD-T0)/total*100), w=Math.max(0.6,(e-t.startD)/total*100);
       var st = isLate(t) && t.status!=='延遲' ? '延遲' : t.status;
       var span = Math.round((e-t.startD)/86400000);
-      row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%"><i style="width:'+effPct(t)+'%"></i></div></div>';
+      row.innerHTML='<div class="lab" title="'+esc(t.name)+'">'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%"><i style="width:'+effPct(t)+'%"></i></div></div>';
       var bar=row.querySelector('.bar');
-      bar.dataset.tip='<b>'+esc(t.id)+' '+esc(t.name)+'</b><br>'+fmtFull(t.startD)+' → '+fmtFull(t.endD)+'（'+span+' 天）<br>'+esc(t.status)+' '+effPct(t)+'%'+(t.person?' · '+esc(t.person):'')+(leftText(t)?' · '+esc(leftText(t)):'');
+      bar.dataset.tip='<b>'+esc(t.name)+'</b><br>'+fmtFull(t.startD)+' → '+fmtFull(t.endD)+'（'+span+' 天）<br>'+esc(t.status)+' '+effPct(t)+'%'+(t.person?' · '+esc(t.person):'')+(leftText(t)?' · '+esc(leftText(t)):'');
       body.appendChild(row);
     });
     var tx=(today()-T0)/total;
-    if(tx>=0 && tx<=1){ var tl=document.createElement('div'); tl.className='g-today'; tl.style.left='calc(190px + (100% - 190px) * '+tx+')'; body.appendChild(tl); }
+    if(tx>=0 && tx<=1){ var tl=document.createElement('div'); tl.className='g-today'; tl.style.left='calc(220px + (100% - 220px) * '+tx+')'; body.appendChild(tl); }
     g.appendChild(body);
   }
 
@@ -603,11 +607,11 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function load(){
     $('mode').textContent='載入中…';
     fetchAll().then(function(res){
-      state.tasks = (res.tasks||[]).map(normTask); state.roles = res.roles||[]; state.serverTime = res.serverTime||''; renderAll();
+      state.roles = res.roles||[]; setTasks(res.tasks); if(demo) state.tasks.forEach(function(t){ t.person=personsForTask(t); }); state.serverTime = res.serverTime||''; renderAll();
     }).catch(function(err){
       $('mode').textContent='連線失敗'; $('mode').className='badge demo';
       $('notice').className='notice on'; $('notice').textContent='無法連到試算表後台：'+err.message+'。請稍後按「重新整理」再試。以下先顯示檔案內的資料。';
-      if(SEED && !state.tasks.length){ state.tasks = SEED.tasks.map(normTask); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); }
+      if(SEED && !state.tasks.length){ setTasks(SEED.tasks); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); }
     });
   }
 
@@ -637,17 +641,29 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   var editing = null;
   function openTaskDlg(t){
     editing = t || null;
-    $('taskDlgTitle').textContent = t ? '修改 '+t.id : '新增工作';
+    $('taskDlgTitle').textContent = t ? '修改工作' : '新增工作';
+    $('taskDelete').style.display = t ? '' : 'none';
     var sel=$('f-role'); sel.innerHTML = state.roles.map(function(r){ return '<option>'+esc(r.role.replace(/\s/g,''))+'</option>'; }).join('') + '<option>全組</option>';
     $('f-name').value = t ? t.name : ''; $('f-detail').value = t ? (t.detail||'') : ''; $('f-output').value = t ? (t.output||'') : '';
     if(t){ var cur=String(t.role||'').replace(/\s/g,''); if(![].some.call(sel.options,function(o){return o.value===cur;})){ var o=document.createElement('option'); o.textContent=cur; sel.appendChild(o); } sel.value=cur; }
     $('f-hours').value = t && t.hours!=='' && t.hours!=null ? t.hours : '';
     $('f-start').value = t ? iso(t.startD) : iso(today()); $('f-end').value = t ? iso(t.endD) : iso(today());
-    $('f-msg').innerHTML=''; $('taskSave').disabled=false;
+    $('f-msg').innerHTML=''; $('taskSave').disabled=false; $('taskDelete').disabled=false;
     $('taskDlg').showModal();
   }
   $('addTask').addEventListener('click', function(){ openTaskDlg(null); });
   $('taskCancel').addEventListener('click', function(){ $('taskDlg').close(); });
+  $('taskDelete').addEventListener('click', function(){
+    if(!editing) return;
+    var me=(meInput.value||'').trim(), msg=$('f-msg');
+    if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
+    if(!confirm('確定刪除「'+editing.name+'」？刪了就找不回來。')) return;
+    editing.by=me; msg.innerHTML='<span class="saving">刪除中…</span>'; $('taskSave').disabled=true; $('taskDelete').disabled=true;
+    pushDelete(editing).then(function(res){
+      if(res.roles) state.roles=res.roles; if(res.tasks) setTasks(res.tasks);
+      state.serverTime=res.serverTime||state.serverTime; $('taskDlg').close(); renderAll();
+    }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('taskSave').disabled=false; $('taskDelete').disabled=false; });
+  });
   $('taskSave').addEventListener('click', function(){
     var me=(meInput.value||'').trim(), msg=$('f-msg');
     if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
@@ -662,7 +678,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     else pr=pushAdd(payload);
     pr.then(function(res){
       if(res.roles) state.roles=res.roles;
-      if(res.tasks){ state.tasks=res.tasks.map(normTask); }
+      if(res.tasks) setTasks(res.tasks);
       state.serverTime=res.serverTime||state.serverTime; $('taskDlg').close(); renderAll();
     }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('taskSave').disabled=false; });
   });
