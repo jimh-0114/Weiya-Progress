@@ -80,12 +80,13 @@
   .empty{color:var(--ink-3);font-size:15px;padding:12px 0;text-align:center}
 
   /* 分工比例 */
-  .roles{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
-  .role{background:var(--paper);border:1px solid var(--line);border-top:5px solid var(--gold);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow);text-align:center}
+  .roles{display:grid;gap:14px;grid-template-columns:repeat(5,1fr)}
+  @media (max-width:1100px){.roles{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}}
+  .role{background:var(--paper);border:1px solid var(--line);border-top:5px solid var(--gold);border-radius:14px;padding:20px 16px;box-shadow:var(--shadow);text-align:center;min-width:0}
   .role .top{display:flex;flex-direction:column;align-items:center;gap:2px}
-  .role .top b{font-family:var(--display);font-size:22px;color:var(--red-dk)}
-  .role .top em{font-style:normal;font-size:40px;font-family:var(--display);color:var(--red);line-height:1.1}
-  .role .meta{font-size:14px;color:var(--ink-2);margin:8px 0 14px}
+  .role .top b{font-family:var(--display);font-size:20px;color:var(--red-dk)}
+  .role .top em{font-style:normal;font-size:36px;font-family:var(--display);color:var(--red);line-height:1.1}
+  .role .meta{font-size:13px;color:var(--ink-2);margin:8px 0 14px;line-height:1.6}
   .role .bar{height:12px;background:var(--line-2);border-radius:99px;overflow:hidden;position:relative}
   .role .bar i{position:absolute;left:0;top:0;height:100%;border-radius:99px}
   .role .bar i.load{background:var(--gold)}
@@ -94,11 +95,11 @@
   .role .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .role .who{font-size:16px;margin:14px 0 10px;padding-top:12px;border-top:1px dashed var(--line)}
   .role .who span.na{color:var(--ink-3)}
-  .role .assign{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
-  .role .assign input{flex:1;min-width:0;max-width:220px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
+  .role .assign{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .role .assign input{flex:1;min-width:110px;max-width:220px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
   .role .assign .btn{padding:7px 14px;white-space:nowrap}
   .role .assign .msg{font-size:12.5px;white-space:nowrap}
-  .role .duty{text-align:left;font-size:14.5px;color:var(--ink);line-height:1.7}
+  .role .duty{text-align:left;font-size:13.5px;color:var(--ink);line-height:1.7}
   .role .duty ul{margin:0;padding:0;list-style:none}
   .role .duty li{position:relative;padding-left:18px;margin:4px 0}
   .role .duty li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
@@ -162,6 +163,9 @@
   .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:#CFE6D6;overflow:hidden}
   .g-row .bar.延遲{background:#F6D3CE}
   .g-row .bar i{position:absolute;left:0;top:0;height:100%;background:var(--s-done);border-radius:4px}
+  .g-row .bar:hover{outline:2px solid var(--red-dk);outline-offset:1px}
+  .g-tip{position:fixed;z-index:50;pointer-events:none;background:var(--red-dk);color:#fff;font-size:13.5px;line-height:1.5;padding:8px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(20,40,70,.3);white-space:nowrap;display:none}
+  .g-tip b{color:#FFD9A8}
   .g-today{position:absolute;top:0;bottom:0;border-left:2px dashed var(--red);pointer-events:none}
   .g-today:after{content:"今天";position:absolute;top:-22px;left:4px;font-size:11px;color:var(--red);white-space:nowrap}
   .g-legend{display:flex;justify-content:center;gap:18px;font-size:14px;color:var(--ink-2);margin-top:14px;flex-wrap:wrap}
@@ -245,9 +249,9 @@
 
   <!-- 時程 -->
   <section class="page" id="page-timeline">
-    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；綠色是完成％</span></div>
+    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；綠色是完成％；滑鼠移到長條上會顯示日期</span></div>
     <div class="filters" id="filters2"><button class="chip on" data-role="">全部</button><span class="sp"></span></div>
-    <div class="gwrap"><div class="gantt" id="gantt"></div>
+    <div class="gwrap"><div class="gantt" id="gantt"></div><div class="g-tip" id="gtip"></div>
       <div class="g-legend"><span><i style="background:var(--s-done)"></i>已完成％</span><span><i style="background:#CFE6D6"></i>未完成</span><span><i style="background:#F6D3CE"></i>逾期未完成</span></div>
     </div>
   </section>
@@ -308,6 +312,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function today(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
   function fmt(x){ return x ? (x.getMonth()+1)+'/'+x.getDate() : '—'; }
+  function fmtFull(x){ return x ? x.getFullYear()+'/'+(x.getMonth()+1)+'/'+x.getDate()+'（'+'日一二三四五六'[x.getDay()]+'）' : '—'; }
   function iso(x){ return x ? x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()) : ''; }
   function pad(n){ return (n<10?'0':'')+n; }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
@@ -546,7 +551,10 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       var e=new Date(t.endD); e.setDate(e.getDate()+1);
       var l=Math.max(0,(t.startD-T0)/total*100), w=Math.max(0.6,(e-t.startD)/total*100);
       var st = isLate(t) && t.status!=='延遲' ? '延遲' : t.status;
-      row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%" title="'+esc(t.id+' '+t.name+'　'+fmt(t.startD)+'→'+fmt(t.endD)+'　'+t.status+' '+effPct(t)+'%')+'"><i style="width:'+effPct(t)+'%"></i></div></div>';
+      var span = Math.round((e-t.startD)/86400000);
+      row.innerHTML='<div class="lab" title="'+esc(t.name)+'"><b>'+esc(t.id)+'</b>'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%"><i style="width:'+effPct(t)+'%"></i></div></div>';
+      var bar=row.querySelector('.bar');
+      bar.dataset.tip='<b>'+esc(t.id)+' '+esc(t.name)+'</b><br>'+fmtFull(t.startD)+' → '+fmtFull(t.endD)+'（'+span+' 天）<br>'+esc(t.status)+' '+effPct(t)+'%'+(t.person?' · '+esc(t.person):'')+(leftText(t)?' · '+esc(leftText(t)):'');
       body.appendChild(row);
     });
     var tx=(today()-T0)/total;
@@ -587,6 +595,13 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
   $('showMore').addEventListener('change', function(){ showMore=this.checked; renderRows(); });
   $('reload').addEventListener('click', load);
+  (function(){
+    var tip=$('gtip'), g=$('gantt');
+    function move(e){ var x=e.clientX+14, y=e.clientY+16; var r=tip.getBoundingClientRect(); if(x+r.width>window.innerWidth-8) x=e.clientX-r.width-14; if(y+r.height>window.innerHeight-8) y=e.clientY-r.height-12; tip.style.left=x+'px'; tip.style.top=y+'px'; }
+    g.addEventListener('mouseover', function(e){ var b=e.target.closest('.bar'); if(!b) return; tip.innerHTML=b.dataset.tip; tip.style.display='block'; move(e); });
+    g.addEventListener('mousemove', function(e){ if(tip.style.display==='block') move(e); });
+    g.addEventListener('mouseout', function(e){ var b=e.target.closest('.bar'); if(b && !b.contains(e.relatedTarget)) tip.style.display='none'; });
+  })();
 
   // ── 新增／修改工作 ──
   var editing = null;
