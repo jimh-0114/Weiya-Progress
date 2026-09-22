@@ -227,7 +227,7 @@
       <div class="tile"><b id="t-days">—</b><span>距活動日</span></div>
     </div>
     <div class="grid2">
-      <div class="card"><div class="hd">各位子完成率</div><div class="bd"><ul class="rlist" id="ov-roles"></ul></div></div>
+      <div class="card"><div class="hd">各組完成率</div><div class="bd"><ul class="rlist" id="ov-roles"></ul></div></div>
       <div class="card"><div class="hd">最近要到期</div><div class="bd"><ul class="dlist" id="ov-due"></ul></div></div>
       <div class="card"><div class="hd">進行中</div><div class="bd"><ul class="dlist" id="ov-doing"></ul></div></div>
       <div class="card"><div class="hd">最近更新</div><div class="bd"><ul class="dlist" id="ov-recent"></ul></div></div>
@@ -253,7 +253,7 @@
     <div class="twrap"><table id="taskTable">
       <colgroup><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
       <thead><tr>
-        <th>工作項目</th><th>負責</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
+        <th>工作項目</th><th>負責組別</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
@@ -276,7 +276,7 @@
     <label>工作細項／說明<textarea id="f-detail" rows="2" placeholder="要做什麼、做到什麼程度"></textarea></label>
     <label>主要產出<input id="f-output" maxlength="40" placeholder="例：報價比較表"></label>
     <div class="two">
-      <label>負責位子<select id="f-role"></select></label>
+      <label>負責組別<select id="f-role"></select></label>
       <label>預估時數（小時）<input id="f-hours" type="number" min="0" step="0.5" placeholder="可先空著"></label>
     </div>
     <div class="two">
@@ -490,7 +490,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<div class="who">負責人：'+(names.length ? '<b>'+esc(names.join('、'))+'</b>' : '<span class="na">待填'+(seats>1?'（'+seats+' 人）':'')+'</span>')+'</div>'
         + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
         + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x){ return !/^甘特圖/.test(x); }).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
-        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這個位子的工作</button></div>'
+        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這組的工作</button></div>'
         + '<div class="assign">'+Array.apply(null,{length:seats}).map(function(_,i){ return '<input placeholder="'+(seats>1?'負責人 '+(i+1):'填負責人名字')+'" maxlength="12" value="'+esc(names[i]||'')+'">'; }).join('')+'<button class="btn primary">儲存</button><span class="msg"></span></div>';
       if(r.role.replace(/\s/g,'')==='統籌') el.querySelector('.top b').addEventListener('dblclick', openHoursDlg);
       var inps=el.querySelectorAll('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
