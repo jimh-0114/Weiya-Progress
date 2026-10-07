@@ -198,7 +198,7 @@
 <body>
 <header>
   <div class="in">
-    <div><h1>尾牙活動組 進度板</h1><div class="sub">台味新樂園 · 活動日 2027/1/29 · 資料更新 <span id="upd">—</span></div></div>
+    <div><h1>尾牙活動組 進度板</h1><div class="sub">台味新樂園 · 活動日 2027/1/15 · 資料更新 <span id="upd">—</span></div></div>
     <span class="sp"></span>
     <span class="badge" id="mode">連線中…</span>
     <label class="me">我是 <input id="me" placeholder="填你的名字" maxlength="12"></label>
@@ -309,7 +309,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   var demo = !GAS;
   var state = { tasks: [], roles: [], serverTime: '' };
   var filterRole = '', hideDone = false, showMore = false;
-  var EVENT = new Date(2027, 0, 29), T0 = new Date(2026, 8, 22), T1 = new Date(2027, 1, 6);
+  var EVENT = new Date(2027, 0, 15), T0 = new Date(2026, 8, 22), T1 = new Date(2027, 1, 6);
   var $ = function(id){ return document.getElementById(id); };
   var meInput = $('me'); meInput.value = ls('me') || '';
   meInput.addEventListener('change', function(){ ls('me', meInput.value.trim()); });
@@ -536,10 +536,18 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         t.start=dS.value; t.end=dE.value; t.by=me; var n=new Date(); t.at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
         normTask(t);
         msg.innerHTML='<span class="saving">儲存中…</span>';
-        pushUpdate(t).then(function(res){
-          if(res.tasks) setTasks(res.tasks);
-          state.serverTime=res.serverTime||state.serverTime; renderAll();
-        }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
+        pushUpdate(t).then(function(res){ savedRow(res); })
+          .catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
+      }
+      // 存檔後只更新這一列，不重畫表格，避免正在填的格子被洗掉、畫面跳動
+      function savedRow(res){
+        state.serverTime=res.serverTime||state.serverTime;
+        var late=isLate(t);
+        tr.className=(late?'late ':'')+(t.status==='已完成'?'done':'');
+        var lf=tr.querySelector('.left'); lf.className='left '+(late?'warn':''); lf.textContent=leftText(t);
+        tr.querySelector('td:last-child .by').innerHTML=esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16));
+        msg.innerHTML='<span class="saved">已存檔</span>';
+        softRefresh();
       }
       dS.addEventListener('change', commitDates);
       dE.addEventListener('change', commitDates);
@@ -553,11 +561,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         t.by=me; var n=new Date(); t.at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
         sel.className='status '+t.status;
         msg.innerHTML='<span class="saving">儲存中…</span>';
-        pushUpdate(t).then(function(res){
-          if(res.tasks) setTasks(res.tasks);
-          state.serverTime = res.serverTime || state.serverTime;
-          renderAll();
-        }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
+        pushUpdate(t).then(function(res){ savedRow(res); }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
       }
       sel.addEventListener('change', commit);
       pct.addEventListener('change', commit);
@@ -601,6 +605,12 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(demo){ mode.textContent='展示模式（未連線）'; mode.className='badge demo'; notice.className='notice on'; notice.textContent='目前是展示模式：資料來自甘特圖檔案，填寫只會存在這台電腦。'; }
     else { mode.textContent='已連線試算表'; mode.className='badge'; notice.className='notice'; }
     renderOverview(); renderRoles(); renderRows(); renderGantt();
+    document.querySelectorAll('.filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
+  }
+  // 填進度時用：更新其他頁的數字，但不動填進度的表格
+  function softRefresh(){
+    $('upd').textContent = state.serverTime || '—';
+    renderOverview(); renderRoles(); renderGantt();
     document.querySelectorAll('.filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
   }
   function load(){
@@ -697,7 +707,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       });
     });
     var TH=totalHours();
-    $('hoursHint').textContent='共 '+r1(TH)+' 小時 · 到 1/29 還有約 '+r1(wk)+' 週 · 多人共責的工作平均分攤';
+    $('hoursHint').textContent='共 '+r1(TH)+' 小時 · 到 1/15 還有約 '+r1(wk)+' 週 · 多人共責的工作平均分攤';
     $('hoursTable').innerHTML='<tr><th>人</th><th>總時數</th><th>≈ 人天</th><th>每週約</th><th>項數</th></tr>'
       + (order.length ? order.sort(function(a,b){ return (per[a].na?1:0)-(per[b].na?1:0) || per[b].h-per[a].h; }).map(function(n){ var p=per[n]; return '<tr class="'+(p.na?'na':'')+'"><td>'+esc(n)+'</td><td>'+r1(p.h)+'</td><td>'+r1(p.h/8)+'</td><td>'+r1(p.h/wk)+' 小時</td><td>'+p.n+'</td></tr>'; }).join('') : '<tr><td colspan="5" class="empty">還沒有人填預估時數</td></tr>');
     $('hoursDlg').showModal();
