@@ -201,6 +201,18 @@
   .isum{text-align:center;font-size:14.5px;color:var(--ink-2);margin:-6px 0 14px}
   dialog .frm label.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);cursor:pointer}
   dialog .frm label.chk input{display:inline-block;width:auto;margin:0}
+  [hidden]{display:none!important}
+  #itemTable{min-width:1200px}
+  #itemTable td.itask{text-align:left;font-size:14px;line-height:1.6}
+  .fitems{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
+  .fitems .it{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 12px;border-radius:99px;background:#E8F0F8;font-size:14px}
+  .fitems .it.new{background:#FFF0E0}
+  .fitems .it button{border:0;background:transparent;cursor:pointer;color:var(--ink-3);font-size:15px;line-height:1;padding:2px 4px}
+  .fitems .it button:hover{color:var(--s-late)}
+  .fitems .none{font-size:13.5px;color:var(--ink-3)}
+  dialog .frm .fpick{display:flex;gap:8px;margin-bottom:10px}
+  dialog .frm .fpick select{flex:1;margin-top:0}
+  dialog .frm .fpick .btn{white-space:nowrap}
   @media (max-width:640px){header h1{font-size:20px}header .sp{display:none}header .in > div:first-child{flex-basis:100%}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
 </style>
 </head>
@@ -291,8 +303,8 @@
       <button class="btn primary" id="addItem">＋ 新增物品</button>
     </div>
     <div class="twrap"><table id="itemTable">
-      <colgroup><col style="width:200px"><col style="width:80px"><col style="width:80px"><col><col style="width:90px"><col style="width:110px"><col style="width:200px"><col style="width:110px"></colgroup>
-      <thead><tr><th>物品</th><th>數量</th><th>場次</th><th>用途</th><th>設計組</th><th>需要日期</th><th>備註</th><th>填寫</th></tr></thead>
+      <colgroup><col style="width:200px"><col style="width:80px"><col style="width:80px"><col><col style="width:200px"><col style="width:90px"><col style="width:110px"><col style="width:200px"><col style="width:110px"></colgroup>
+      <thead><tr><th>物品</th><th>數量</th><th>場次</th><th>用途</th><th>相關工作</th><th>設計組</th><th>需要日期</th><th>備註</th><th>填寫</th></tr></thead>
       <tbody id="irows"></tbody>
     </table></div>
   </section>
@@ -312,6 +324,7 @@
       <label class="chk" style="margin-top:26px"><input id="i-design" type="checkbox"> 要請設計組做</label>
     </div>
     <label>備註<textarea id="i-note" rows="2" placeholder="尺寸、文字內容、參考圖等"></textarea></label>
+    <label class="chk" id="i-syncRow"><input id="i-sync" type="checkbox" checked> 同步到物品清單（不勾＝只寫進主要產出）</label>
     <div class="msg" id="i-msg"></div>
   </div>
   <div class="row"><button class="btn danger" id="itemDelete" type="button">刪除這項物品</button><span style="flex:1"></span><button class="btn" id="itemCancel">取消</button><button class="btn primary" id="itemSave">儲存</button></div>
@@ -331,6 +344,9 @@
       <label>預計開始<input id="f-start" type="date"></label>
       <label>預計完成<input id="f-end" type="date"></label>
     </div>
+    <label>需要的物品</label>
+    <div class="fitems" id="f-items"></div>
+    <div class="fpick"><select id="f-itemPick"></select><button class="btn" type="button" id="f-itemNew">＋ 新增物品</button></div>
     <div class="msg" id="f-msg"></div>
   </div>
   <div class="row"><button class="btn danger" id="taskDelete" type="button">刪除這項工作</button><span style="flex:1"></span><button class="btn" id="taskCancel">取消</button><button class="btn primary" id="taskSave">儲存</button></div>
@@ -676,17 +692,26 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       var tr=document.createElement('tr');
       tr.innerHTML='<td><div class="name">'+esc(it.name)+'</div><button class="edit" type="button">修改</button></td>'
         +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td><td class="use">'+esc(it.use)+'</td>'
+        +'<td class="itask">'+(taskNames(it.tasks).map(esc).join('<br>')||'—')+'</td>'
         +'<td>'+(it.design==='要'?'<span class="dz">要做</span>':'—')+'</td>'
         +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+esc(it.note)+'</td>'
         +'<td><div class="by">'+(it.by?esc(it.by)+'<br>'+esc(String(it.at||'').slice(5,16)):'—')+'</div></td>';
       tr.querySelector('.edit').addEventListener('click', function(){ openItemDlg(it); });
       tb.appendChild(tr);
     });
-    if(!tb.children.length) tb.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
+    if(!tb.children.length) tb.innerHTML='<tr><td colspan="9" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
   }
+  function idList(s){ return String(s||'').split(/[、,，\s]+/).filter(Boolean); }
+  function taskNames(s){ return idList(s).map(function(id){ var t=state.tasks.filter(function(x){ return x.id===id; })[0]; return t?t.name:''; }).filter(Boolean); }
+  function itemsOfTask(id){ return (state.items||[]).filter(function(x){ return idList(x.tasks).indexOf(id)>=0; }); }
   function demoItems(){ ls('items', JSON.stringify(state.items)); return Promise.resolve({ ok:true, items:state.items, serverTime:'展示模式' }); }
+  function pushLink(taskId, ids){
+    if(!demo) return jsonp({ action:'linkItems', task:taskId, ids:ids.join('、') });
+    state.items.forEach(function(x){ var cur=idList(x.tasks), has=cur.indexOf(taskId)>=0, sh=ids.indexOf(x.id)>=0; if(has!==sh) x.tasks=(sh?cur.concat([taskId]):cur.filter(function(y){ return y!==taskId; })).join('、'); });
+    return demoItems();
+  }
   function pushItem(it){
-    if(!demo) return jsonp({ action:'itemSave', id:it.id||'', name:it.name, qty:it.qty, scene:it.scene, use:it.use, design:it.design, need:it.need, note:it.note, by:it.by });
+    if(!demo) return jsonp({ action:'itemSave', id:it.id||'', name:it.name, qty:it.qty, scene:it.scene, use:it.use, design:it.design, need:it.need, note:it.note, tasks:it.tasks||'', by:it.by });
     if(it.id){ state.items=state.items.map(function(x){ return x.id===it.id?it:x; }); }
     else { var mx=0; state.items.forEach(function(x){ var m=/^B(\d+)$/.exec(x.id); if(m) mx=Math.max(mx,+m[1]); }); it.id='B'+(mx+1<10?'0':'')+(mx+1); state.items.push(it); }
     return demoItems();
@@ -695,14 +720,17 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(!demo) return jsonp({ action:'itemDelete', id:it.id, by:it.by });
     state.items=state.items.filter(function(x){ return x.id!==it.id; }); return demoItems();
   }
-  function openItemDlg(it){
-    editingItem=it||null;
+  var itemDraft=null; // 從工作視窗開的新增物品：先放進工作視窗，按工作的儲存才一起寫入
+  function openItemDlg(it, draft){
+    editingItem=it||null; itemDraft=draft||null;
     $('itemDlgTitle').textContent = it?'修改物品':'新增物品';
     $('itemDelete').style.display = it?'':'none';
     $('i-name').value=it?it.name:''; $('i-qty').value=it&&it.qty!==''?it.qty:'';
     $('i-scene').value=it?(it.scene||'戶外'):(itemScene||'戶外'); $('i-use').value=it?(it.use||''):'';
     $('i-need').value=it&&it.need?iso(toDate(it.need)):''; $('i-design').checked=!!(it&&it.design==='要');
     $('i-note').value=it?(it.note||''):'';
+    if(draft) $('i-scene').value=draft.scene;
+    $('i-syncRow').hidden=!draft; $('i-sync').checked=true;
     $('i-msg').innerHTML=''; $('itemSave').disabled=false; $('itemDelete').disabled=false;
     $('itemDlg').showModal();
   }
@@ -721,8 +749,9 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var name=$('i-name').value.trim(); if(!name){ msg.innerHTML='<span class="err">請填物品名稱</span>'; return; }
     var n=new Date();
     var it={ id:editingItem?editingItem.id:'', name:name, qty:$('i-qty').value===''?'':Number($('i-qty').value), scene:$('i-scene').value, use:$('i-use').value.trim(),
-      design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me,
+      design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me, tasks:editingItem?(editingItem.tasks||''):'',
       at:n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes()) };
+    if(itemDraft){ itemDraft.add(it, $('i-sync').checked); $('itemDlg').close(); return; }
     msg.innerHTML='<span class="saving">儲存中…</span>'; $('itemSave').disabled=true;
     pushItem(it).then(itemDone).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('itemSave').disabled=false; });
   });
@@ -785,7 +814,47 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     $('f-hours').value = t && t.hours!=='' && t.hours!=null ? t.hours : '';
     $('f-start').value = t ? iso(t.startD) : iso(today()); $('f-end').value = t ? iso(t.endD) : iso(today());
     $('f-msg').innerHTML=''; $('taskSave').disabled=false; $('taskDelete').disabled=false;
+    linkIds = t ? itemsOfTask(t.id).map(function(x){ return x.id; }) : []; linkOrig = linkIds.join('、'); newItems = [];
+    renderTaskItems();
     $('taskDlg').showModal();
+  }
+  // ── 工作視窗裡的物品 ──
+  var linkIds=[], linkOrig='', newItems=[];
+  function renderTaskItems(){
+    var box=$('f-items'), html='';
+    linkIds.forEach(function(id){ var x=state.items.filter(function(i){ return i.id===id; })[0]; if(x) html+='<span class="it">'+esc(x.name)+(x.qty!==''?' ×'+esc(x.qty):'')+'<button type="button" data-un="'+esc(id)+'" title="移除">✕</button></span>'; });
+    newItems.forEach(function(x,i){ html+='<span class="it new">'+esc(x.name)+(x.qty!==''?' ×'+esc(x.qty):'')+'（新）<button type="button" data-unnew="'+i+'" title="移除">✕</button></span>'; });
+    box.innerHTML = html || '<span class="none">還沒有物品</span>';
+    var pick=$('f-itemPick'), rest=(state.items||[]).filter(function(x){ return linkIds.indexOf(x.id)<0; });
+    pick.innerHTML='<option value="">'+(rest.length?'從物品清單選…':'物品清單沒有其他物品')+'</option>'+rest.map(function(x){ return '<option value="'+esc(x.id)+'">'+esc(x.name)+(x.scene?'（'+esc(x.scene)+'）':'')+'</option>'; }).join('');
+    pick.disabled=!rest.length;
+  }
+  $('f-items').addEventListener('click', function(e){
+    var b=e.target.closest('button'); if(!b) return;
+    if(b.dataset.un) linkIds=linkIds.filter(function(x){ return x!==b.dataset.un; });
+    else newItems.splice(+b.dataset.unnew,1);
+    renderTaskItems();
+  });
+  $('f-itemPick').addEventListener('change', function(){ if(this.value){ linkIds.push(this.value); renderTaskItems(); } });
+  $('f-itemNew').addEventListener('click', function(){
+    var role=$('f-role').value, scene=/戶外/.test(role)?'戶外':(/餐會/.test(role)?'餐會':'共用');
+    openItemDlg(null, { scene:scene, add:function(it, sync){
+      // 一律寫進主要產出；有勾同步才另外加到物品清單
+      var o=$('f-output'), line=it.name+(it.qty!==''?' ×'+it.qty:'');
+      o.value = o.value.trim() ? o.value.replace(/\s+$/,'')+'\n'+line : line;
+      if(sync){ newItems.push(it); renderTaskItems(); }
+    } });
+  });
+  // 工作存好後，再把物品的連結寫進物品清單
+  function syncTaskItems(taskId){
+    if(linkIds.join('、')===linkOrig && !newItems.length) return Promise.resolve();
+    var p = linkIds.join('、')===linkOrig ? Promise.resolve() : pushLink(taskId, linkIds).then(itemsBack);
+    newItems.forEach(function(it){ p=p.then(function(){ it.tasks=taskId; return pushItem(it); }).then(itemsBack); });
+    return p;
+  }
+  function itemsBack(res){
+    if(!res.items || res.items.some(function(x){ return !('tasks' in x); })) throw new Error('工作已存檔，但物品沒連上：後台還沒更新，請通知 Jim 重新部署 GAS');
+    setItems(res.items);
   }
   $('addTask').addEventListener('click', function(){ openTaskDlg(null); });
   $('taskCancel').addEventListener('click', function(){ $('taskDlg').close(); });
@@ -812,11 +881,16 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var pr;
     if(editing){ Object.assign(editing, payload); normTask(editing); pr=pushEdit(editing); }
     else pr=pushAdd(payload);
+    var isNew=!editing;
     pr.then(function(res){
       if(res.roles) state.roles=res.roles;
       if(res.tasks) setTasks(res.tasks);
-      state.serverTime=res.serverTime||state.serverTime; $('taskDlg').close(); renderAll();
-    }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('taskSave').disabled=false; });
+      state.serverTime=res.serverTime||state.serverTime;
+      var taskId = isNew ? (res.newId||payload.id) : editing.id;
+      if(isNew) editing = state.tasks.filter(function(x){ return x.id===taskId; })[0] || null; // 物品沒連上時再按儲存，不會重複新增工作
+      return syncTaskItems(taskId);
+    }).then(function(){ newItems=[]; $('taskDlg').close(); renderAll(); })
+      .catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('taskSave').disabled=false; renderAll(); });
   });
 
   // ── 每人時數（統籌標題點兩下） ──
