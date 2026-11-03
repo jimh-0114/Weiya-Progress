@@ -6,65 +6,71 @@
 <title>尾牙活動組 進度板</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#2B5C8A; --red-dk:#1F4566; --gold:#EE8A2E; --cream:#F3F6FA; --paper:#FFFFFF;
-    --ink:#1F2933; --ink-2:#4A5A6A; --ink-3:#7E8B99; --line:#D8E1EC; --line-2:#EDF2F7;
-    --s-none:#B5BEC9; --s-doing:#EE8A2E; --s-done:#3E9B5B; --s-late:#D14B3C;
+    /* 翰林時光機 標準色（茄芷袋）：藍 #0076ac／#74b5e4、紅 #ea616f／#f29c97、綠 #4aa374／#8bc782 */
+    --red:#0076ac; --red-dk:#005b86; --gold:#ea616f; --cream:#F5F0E4; --paper:#FFFDF8;
+    --lblue:#74b5e4; --pink:#f29c97; --green:#4aa374; --lgreen:#8bc782;
+    --ink:#24323d; --ink-2:#51606b; --ink-3:#8a948f; --line:#CFDDE6; --line-2:#EEE9DD;
+    --s-none:#B5BEC9; --s-doing:#0076ac; --s-done:#4aa374; --s-late:#d64a5a;
+    --frame:0 0 0 1.5px var(--lblue), inset 0 0 0 3px var(--paper), inset 0 0 0 4px rgba(234,97,111,.45), 0 4px 14px rgba(0,70,100,.08);
+    --stripe:repeating-linear-gradient(90deg,#0076ac 0 36px,#fff 36px 39px,#ea616f 39px 75px,#fff 75px 78px,#4aa374 78px 114px,#fff 114px 117px);
     --font:"Noto Sans TC","Microsoft JhengHei","微軟正黑體","PingFang TC",sans-serif;
     --display:"Noto Serif TC","Noto Sans TC","Microsoft JhengHei",serif;
-    --shadow:0 3px 14px rgba(30,60,90,.10);
+    --shadow:0 3px 14px rgba(0,70,100,.08);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;font-family:var(--font);color:var(--ink);background:var(--cream);background-image:linear-gradient(180deg,#E3ECF5 0,var(--cream) 320px);font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
+  body{margin:0;font-family:var(--font);color:var(--ink);background-color:var(--cream);background-image:radial-gradient(rgba(0,118,172,.07) 1px,transparent 1.3px);background-size:7px 7px;font-size:16px;line-height:1.75;-webkit-font-smoothing:antialiased}
   h1,h2,h3{font-family:var(--display);margin:0;font-weight:700;letter-spacing:.02em}
   button,select,input,textarea{font:inherit;color:inherit}
   a{color:var(--red)}
 
   /* ── 頁首 ── */
-  header{background:linear-gradient(135deg,#2B5C8A 0,#1F4566 100%);color:#fff;box-shadow:0 2px 10px rgba(20,40,70,.3);position:sticky;top:0;z-index:20}
+  header{background:#FBF7EE;color:var(--ink);box-shadow:0 2px 10px rgba(0,70,100,.10);position:sticky;top:0;z-index:20}
+  header:after{content:"";display:block;height:6px;background:var(--stripe)}
   header .in{max-width:1400px;margin:0 auto;padding:12px 20px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  header h1{font-size:24px;letter-spacing:.06em;line-height:1.2}
-  header .sub{font-size:13px;opacity:.9;margin-top:2px}
+  header h1{font-size:26px;letter-spacing:.08em;line-height:1.2;color:var(--red);font-weight:900}
+  header .eng{font-size:11px;letter-spacing:.35em;color:var(--gold);font-weight:700;line-height:1}
+  header .sub{font-size:13px;color:var(--ink-2);margin-top:2px}
   header .sp{flex:1}
-  .badge{font-size:12.5px;padding:4px 12px;border-radius:99px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);white-space:nowrap}
-  .badge.demo{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+  .badge{font-size:12.5px;padding:4px 12px;border-radius:99px;background:#fff;color:var(--red);border:1px solid var(--lblue);white-space:nowrap}
+  .badge.demo{background:var(--gold);color:#fff;border-color:var(--gold)}
   .me{display:flex;align-items:center;gap:8px;font-size:13.5px;white-space:nowrap}
-  .me input{width:130px;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.6);background:#fff;color:var(--ink)}
+  .me input{width:130px;padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink)}
   .btn{padding:6px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer}
-  .btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.55)}
-  .btn.ghost:hover{background:rgba(255,255,255,.12)}
+  .btn.ghost{background:#fff;color:var(--red);border-color:var(--red)}
+  .btn.ghost:hover{background:#EAF4FA}
   .btn.primary{background:var(--red);color:#fff;border-color:var(--red)}
   .btn.danger{color:var(--s-late);border-color:var(--s-late);background:#fff}
   .btn.danger:hover{background:#FFF3F1}
   nav.tabs{max-width:1400px;margin:6px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
-  nav.tabs button{background:transparent;border:0;color:rgba(255,255,255,.88);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
-  nav.tabs button:hover{color:#fff}
-  nav.tabs button.on{color:#fff;border-bottom-color:var(--gold);font-weight:500}
+  nav.tabs button{background:transparent;border:0;color:var(--ink-2);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+  nav.tabs button:hover{color:var(--red)}
+  nav.tabs button.on{color:var(--red);border-bottom-color:var(--gold);font-weight:700}
 
   /* ── 主體 ── */
   main{max-width:1400px;margin:0 auto;padding:24px 20px 80px}
   .page{display:none}.page.on{display:block}
-  .notice{background:#FFF0E0;border:1px solid var(--gold);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:20px;display:none;text-align:center}
+  .notice{background:#FDEEEE;border:1px solid var(--pink);border-radius:10px;padding:12px 16px;font-size:15px;margin-bottom:20px;display:none;text-align:center}
   .notice.on{display:block}
   .sec-h{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 20px;text-align:center}
-  .sec-h h2{font-size:26px;color:var(--red-dk)}
+  .sec-h h2{font-size:28px;color:var(--red);font-weight:900;letter-spacing:.08em}
   .sec-h h2:after{content:"";display:block;width:56px;height:3px;background:var(--gold);margin:8px auto 0;border-radius:2px}
   .sec-h .hint{font-size:14px;color:var(--ink-2);max-width:720px}
-  .card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .card{background:var(--paper);border:0;border-radius:16px;box-shadow:var(--frame)}
 
   /* 總覽 */
   .tiles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin-bottom:24px}
-  .tile{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 16px;box-shadow:var(--shadow);text-align:center}
+  .tile{background:var(--paper);border:0;border-radius:16px;padding:18px 16px;box-shadow:var(--frame);text-align:center}
   .tile b{display:block;font-size:38px;font-family:var(--display);line-height:1.1;color:var(--red)}
   .tile span{font-size:14px;color:var(--ink-2);font-weight:500}
   .tile .bar{height:8px;background:var(--line-2);border-radius:99px;margin-top:10px;overflow:hidden}
   .tile .bar i{display:block;height:100%;background:var(--s-done);border-radius:99px;transition:width .4s}
   .grid2{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
-  .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-family:var(--display);font-size:18px;color:var(--red-dk);text-align:center;background:#E8F0F8;border-radius:14px 14px 0 0}
+  .card .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-family:var(--display);font-size:19px;font-weight:900;color:var(--red);text-align:center;background:none;border-bottom-style:dashed}
   .card .bd{padding:8px 18px 14px}
   .rlist{list-style:none;margin:0;padding:0}
   .rlist li{display:grid;grid-template-columns:120px 1fr 52px;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line-2);font-size:15px}
@@ -83,30 +89,26 @@
   /* 分工比例 */
   .roles{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
   @media (min-width:1280px){.roles{grid-template-columns:repeat(5,1fr)}.role{padding:20px 14px}.role .top b{font-size:19px}.role .duty{font-size:13px}}
-  .role{background:var(--paper);border:1px solid var(--line);border-top:5px solid var(--gold);border-radius:14px;padding:22px 22px;box-shadow:var(--shadow);text-align:center;min-width:0}
+  .role{background:var(--stripe) top/100% 6px no-repeat,var(--paper);border:0;border-radius:16px;padding:24px 22px 22px;box-shadow:var(--frame);text-align:center;min-width:0;overflow:hidden;display:flex;flex-direction:column}
   .role .top{display:flex;flex-direction:column;align-items:center;gap:2px}
-  .role .top b{font-family:var(--display);font-size:20px;color:var(--red-dk)}
+  .role .top b{font-family:var(--display);font-size:20px;font-weight:900;color:var(--red)}
   .role .top em{font-style:normal;font-size:36px;font-family:var(--display);color:var(--red);line-height:1.1}
   .role .meta{font-size:13px;color:var(--ink-2);margin:8px 0 14px;line-height:1.6}
   .role .bar{height:12px;background:var(--line-2);border-radius:99px;overflow:hidden;position:relative}
   .role .bar i{position:absolute;left:0;top:0;height:100%;border-radius:99px}
-  .role .bar i.load{background:var(--gold)}
+  .role .bar i.load{background:var(--pink)}
   .role .bar i.done{background:var(--red)}
   .role .legend{display:flex;justify-content:center;gap:16px;font-size:13.5px;color:var(--ink-2);margin-top:8px}
   .role .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .role .who{font-size:16px;margin:14px 0 10px;padding-top:12px;border-top:1px dashed var(--line)}
   .role .who span.na{color:var(--ink-3)}
-  .role .assign{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
-  .role .assign input{flex:1;min-width:100px;max-width:160px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;text-align:center}
-  .role .assign .btn{padding:7px 14px;white-space:nowrap}
-  .role .assign .msg{font-size:12.5px;white-space:nowrap}
   .role .duty{text-align:left;font-size:13.5px;color:var(--ink);line-height:1.7}
   .role .duty ul{margin:0;padding:0;list-style:none}
   .role .duty li{position:relative;padding-left:18px;margin:4px 0}
   .role .duty li:before{content:"";position:absolute;left:2px;top:.72em;width:8px;height:8px;border-radius:50%;background:var(--gold)}
   .role .duty .sub{margin-top:10px;padding-top:8px;border-top:1px dotted var(--line);color:var(--ink-3);font-size:13px}
   .role .duty .sub div{margin:2px 0}
-  .role .go{margin-top:12px}
+  .role .go{margin-top:auto;padding-top:14px}
   .role .go button{font-size:13px;padding:5px 12px}
 
   /* 篩選 */
@@ -117,23 +119,19 @@
   .filters label{font-size:14.5px;display:flex;gap:6px;align-items:center;cursor:pointer}
 
   /* 填進度 */
-  .twrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .twrap{overflow-x:auto;background:var(--paper);border:1.5px solid var(--lblue);border-radius:16px;box-shadow:var(--shadow)}
   table{border-collapse:collapse;width:100%;font-size:15px;min-width:1300px;table-layout:fixed}
   th,td{padding:14px 14px;border-bottom:1px solid var(--line-2);vertical-align:middle;text-align:center}
-  td:first-child{text-align:left}
+  td:first-child,th:first-child{text-align:left}
   td:first-child .name{line-height:1.5}
   td .by{white-space:normal}
-  th{background:#E8F0F8;color:var(--red-dk);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
+  th{background:#E7F2F9;color:var(--red);white-space:nowrap;font-weight:700;position:sticky;top:0;z-index:1}
   tr:last-child td{border-bottom:none}
-  tr.late td{background:#FFF3F1}
+  tr.late td{background:#FDEFEF}
   tr.done td{color:#8a8078}
   td.id{font-weight:700;white-space:nowrap;color:var(--red)}
   td .name{font-weight:700;font-size:16px}
   td .detail{font-size:14px;color:var(--ink-2);margin-top:4px;line-height:1.65}
-  td .more{font-size:13px;color:var(--ink-3);margin-top:4px;display:none;white-space:pre-wrap}
-  .showmore td .more{display:block}
-  .load{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13.5px;white-space:nowrap;font-weight:500}
-  .load.高{background:#F9C9A3;color:#7A3A10}.load.中{background:#FBE3B8;color:#7A5200}.load.低{background:#D4E8F5;color:#1F4566}
   td .hours{font-size:13px;color:var(--ink-2);display:block;line-height:1.5;white-space:nowrap}
   td .hours input{width:64px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);text-align:right;font-size:13.5px}
   td .hours input:focus{border-color:var(--gold);outline:none}
@@ -147,7 +145,7 @@
   select.status.進行中{border-color:var(--s-doing);color:var(--s-doing)}
   select.status.已完成{border-color:var(--s-done);color:var(--s-done)}
   select.status.延遲{border-color:var(--s-late);color:var(--s-late)}
-  td.out{text-align:left;font-size:14px;line-height:1.6;white-space:pre-wrap}
+  td.out{text-align:center;font-size:14px;line-height:1.6;white-space:pre-wrap}
   td.out .na{color:var(--ink-3)}
   textarea.note{width:100%;min-height:44px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);resize:vertical;line-height:1.5;text-align:left}
   td .by{font-size:13px;color:var(--ink-2);line-height:1.5}
@@ -155,7 +153,7 @@
   .saving{color:var(--s-doing)}.saved{color:var(--s-done)}.err{color:var(--s-late)}
 
   /* 時程 */
-  .gwrap{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px 18px;box-shadow:var(--shadow)}
+  .gwrap{overflow-x:auto;background:var(--paper);border:1.5px solid var(--lblue);border-radius:16px;padding:16px 18px 18px;box-shadow:var(--shadow)}
   .gantt{min-width:960px;position:relative}
   .g-months{height:26px;font-size:13.5px;color:var(--ink-2);border-bottom:1px solid var(--line);position:relative;margin-left:220px}
   .g-months span{position:absolute;top:3px;border-left:1px solid var(--line);padding-left:6px;height:22px}
@@ -166,23 +164,23 @@
   .g-row .track.nodate:after{content:"尚未排定日期";font-size:12px;color:var(--ink-3);position:absolute;left:8px;top:-2px}
   .g-row .lab b{color:var(--red);margin-right:4px}
   .g-row .track{flex:1;height:16px;position:relative;background:var(--line-2);border-radius:4px}
-  .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:#CFE6D6;overflow:hidden}
-  .g-row .bar.延遲{background:#F6D3CE}
+  .g-row .bar{position:absolute;top:0;height:100%;border-radius:4px;background:#D2EBD3;overflow:hidden}
+  .g-row .bar.延遲{background:#F9D3D1}
   .g-row .bar i{position:absolute;left:0;top:0;height:100%;background:var(--s-done);border-radius:4px}
   .g-row .bar:hover{outline:2px solid var(--red-dk);outline-offset:1px}
   .g-tip{position:fixed;z-index:50;pointer-events:none;background:var(--red-dk);color:#fff;font-size:13.5px;line-height:1.5;padding:8px 12px;border-radius:8px;box-shadow:0 4px 14px rgba(20,40,70,.3);white-space:nowrap;display:none}
-  .g-tip b{color:#FFD9A8}
+  .g-tip b{color:#FFD3CF}
   .g-today{position:absolute;top:0;bottom:0;border-left:2px dashed var(--red);pointer-events:none}
-  .g-today:after{content:"今天";position:absolute;top:-22px;left:4px;font-size:11px;color:var(--red);white-space:nowrap}
-  .g-legend{display:flex;justify-content:center;gap:18px;font-size:14px;color:var(--ink-2);margin-top:14px;flex-wrap:wrap}
+  .g-today:after{content:"今天";position:absolute;bottom:-20px;left:-12px;font-size:12px;color:var(--red);white-space:nowrap;font-weight:700}
+  .g-legend{display:flex;justify-content:center;gap:18px;font-size:14px;color:var(--ink-2);margin-top:28px;flex-wrap:wrap}
   .g-legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
 
   footer{text-align:center;font-size:13.5px;color:var(--ink-3);padding:28px}
   td .edit{display:inline-block;margin-top:6px;font-size:12.5px;padding:2px 10px;border-radius:99px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink-2)}
   td .edit:hover{border-color:var(--gold);color:var(--gold)}
-  dialog{border:1px solid var(--line);border-radius:14px;padding:24px;max-width:560px;width:92vw;font-family:var(--font);color:var(--ink)}
-  dialog::backdrop{background:rgba(20,40,70,.4)}
-  dialog h2{font-size:20px;color:var(--red-dk);margin-bottom:12px;text-align:center}
+  dialog{border:1.5px solid var(--lblue);border-radius:16px;background:var(--paper);padding:24px;max-width:560px;width:92vw;font-family:var(--font);color:var(--ink)}
+  dialog::backdrop{background:rgba(0,50,80,.35)}
+  dialog h2{font-size:22px;font-weight:900;color:var(--red);margin-bottom:12px;text-align:center}
   dialog .frm label{display:block;font-size:13.5px;color:var(--ink-2);margin-bottom:10px}
   dialog .frm input,dialog .frm textarea,dialog .frm select{display:block;width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font-size:15px}
   dialog .frm .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -191,39 +189,29 @@
   .ptable{width:100%;min-width:0;border-collapse:collapse;font-size:14.5px;margin-bottom:12px;table-layout:auto}
   .ptable th,.ptable td{padding:8px 10px;border-bottom:1px solid var(--line-2);text-align:right;white-space:nowrap}
   .ptable th:first-child,.ptable td:first-child{text-align:left}
-  .ptable th{background:#E8F0F8;color:var(--red-dk);position:static}
+  .ptable th{background:#E7F2F9;color:var(--red);position:static}
   .ptable tr.na td{color:var(--ink-3)}
   /* 物品清單 */
   #itemTable{min-width:1000px}
   #itemTable td{text-align:center}
   #itemTable td:first-child{text-align:left}
-  #itemTable td.use,#itemTable td.inote{text-align:left;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap}
-  .dz{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13.5px;background:#FBE3B8;color:#7A5200;font-weight:500;white-space:nowrap}
+  #itemTable td.inote{text-align:center;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap}
+  .dz{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13.5px;background:#FDE2E0;color:#B53A4A;font-weight:500;white-space:nowrap}
   .isum{text-align:center;font-size:14.5px;color:var(--ink-2);margin:-6px 0 14px}
   dialog .frm label.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);cursor:pointer}
   dialog .frm label.chk input{display:inline-block;width:auto;margin:0}
   [hidden]{display:none!important}
-  #itemTable{min-width:1000px}
-  #itemTable td.itask{text-align:left;font-size:14px;line-height:1.6}
-  .fitems{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
-  .fitems .it{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 12px;border-radius:99px;background:#E8F0F8;font-size:14px}
-  .fitems .it.new{background:#FFF0E0}
-  .fitems .it button{border:0;background:transparent;cursor:pointer;color:var(--ink-3);font-size:15px;line-height:1;padding:2px 4px}
-  .fitems .it button:hover{color:var(--s-late)}
-  .fitems .none{font-size:13.5px;color:var(--ink-3)}
+  #itemTable td.itask{text-align:center;font-size:14px;line-height:1.6}
   #f-typeBox textarea{display:block;width:100%;margin:-4px 0 6px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;resize:vertical}
   dialog .frm .fsync{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 10px}
   dialog .frm .fsync label.chk{margin:0}
-  dialog .frm .fpick{display:flex;gap:8px;margin-bottom:10px}
-  dialog .frm .fpick select{flex:1;margin-top:0}
-  dialog .frm .fpick .btn{white-space:nowrap}
   @media (max-width:640px){header h1{font-size:20px}header .sp{display:none}header .in > div:first-child{flex-basis:100%}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
 </style>
 </head>
 <body>
 <header>
   <div class="in">
-    <div><h1>尾牙活動組 進度板</h1><div class="sub">台味新樂園 · 活動日 2027/1/15 · 資料更新 <span id="upd">—</span></div></div>
+    <div><div class="eng">· HANLIN ·</div><h1>尾牙活動組 進度板</h1><div class="sub">翰林時光機 · 活動日 2027/1/15 · 資料更新 <span id="upd">—</span></div></div>
     <span class="sp"></span>
     <span class="badge" id="mode">連線中…</span>
     <label class="me">我是 <input id="me" placeholder="填你的名字" maxlength="12"></label>
@@ -244,7 +232,7 @@
   <!-- 總覽 -->
   <section class="page on" id="page-overview">
     <div class="tiles">
-      <div class="tile"><b id="t-pct">0%</b><span>整體完成率（依時數加權）</span><div class="bar"><i id="t-bar"></i></div></div>
+      <div class="tile"><b id="t-pct">0%</b><span>整體完成率</span><div class="bar"><i id="t-bar"></i></div></div>
       <div class="tile"><b id="t-done">0</b><span>已完成 / <span id="t-total">26</span> 項</span></div>
       <div class="tile"><b id="t-doing">0</b><span>進行中</span></div>
       <div class="tile"><b id="t-week">0</b><span>本週到期</span></div>
@@ -261,13 +249,13 @@
 
   <!-- 分工比例 -->
   <section class="page" id="page-roles">
-    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝該位子分攤的預估時數 ÷ 全組總時數，多人共責的工作平均分攤；橘條是負荷、藍條是完成率。在卡片下方填名字按儲存，會同步寫進試算表與每項工作的負責人</span></div>
+    <div class="sec-h"><h2>分工比例</h2><span class="hint">比例＝這個位子的預估時數占全組的多少；粉色條是負荷、藍色條是完成率</span></div>
     <div class="roles" id="roles"></div>
   </section>
 
   <!-- 填進度 -->
   <section class="page" id="page-tasks">
-    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、預估時數、狀態或備註後會自動存檔；完成率依「已完成」的工作計算。工作依預計完成日排序，還沒排日期的在最後</span></div>
+    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字，改完會自動存檔</span></div>
     <div class="filters" id="filters">
       <button class="chip on" data-role="">全部</button>
       <span class="sp"></span>
@@ -285,16 +273,16 @@
 
   <!-- 時程 -->
   <section class="page" id="page-timeline">
-    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；綠色是完成％；滑鼠移到長條上會顯示日期</span></div>
+    <div class="sec-h"><h2>時程</h2><span class="hint">虛線是今天；滑鼠移到長條上會顯示日期</span></div>
     <div class="filters" id="filters2"><button class="chip on" data-role="">全部</button><span class="sp"></span></div>
     <div class="gwrap"><div class="gantt" id="gantt"></div><div class="g-tip" id="gtip"></div>
-      <div class="g-legend"><span><i style="background:var(--s-done)"></i>已完成％</span><span><i style="background:#CFE6D6"></i>未完成</span><span><i style="background:#F6D3CE"></i>逾期未完成</span></div>
+      <div class="g-legend"><span><i style="background:var(--s-done)"></i>已完成</span><span><i style="background:#D2EBD3"></i>未完成</span><span><i style="background:#F9D3D1"></i>逾期未完成</span></div>
     </div>
   </section>
 
   <!-- 物品清單 -->
   <section class="page" id="page-items">
-    <div class="sec-h"><h2>物品清單</h2><span class="hint">活動要用的道具、文宣品、備品都列在這裡；要設計組做的請勾選</span></div>
+    <div class="sec-h"><h2>物品清單</h2><span class="hint">活動要用的道具、文宣品、備品；要設計組做的請勾選</span></div>
     <div class="isum" id="isum"></div>
     <div class="filters" id="ifilters">
       <button class="chip on" data-scene="">全部</button>
@@ -361,7 +349,7 @@
   <div class="row"><button class="btn" id="hoursClose">關閉</button></div>
 </dialog>
 
-<footer>2027 尾牙活動組 進度板 · 資料來源：活動組工作甘特圖「進度資料」分頁</footer>
+<footer>翰林時光機 · 尾牙活動組 進度板</footer>
 
 <script>
 // ── GAS 網址 ──
@@ -553,25 +541,12 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       el.innerHTML = '<div class="top"><b>'+esc(r.role)+'</b><em>'+(TH>0?Math.round(ratio*100)+'%':'—')+'</em></div>'
         + '<div class="meta">'+(rh>0 ? '約 '+r1(rh)+' 小時 ≈ '+r1(rh/8)+' 人天 · 每週約 '+r1(rh/wk)+' 小時'+(seats>1?'（每人約 '+r1(rh/wk/seats)+'）':'') : '還沒填預估時數')+' · '+mine.length+' 項工作</div>'
         + '<div class="bar"><i class="load" style="width:'+loadW+'%"></i><i class="done" style="width:'+Math.round(loadW*pct/100)+'%"></i></div>'
-        + '<div class="legend"><span><i style="background:var(--gold)"></i>負荷 '+(TH>0?Math.round(ratio*100)+'%':'—')+'</span><span><i style="background:var(--red)"></i>完成 '+pct+'%</span></div>'
+        + '<div class="legend"><span><i style="background:var(--pink)"></i>負荷 '+(TH>0?Math.round(ratio*100)+'%':'—')+'</span><span><i style="background:var(--red)"></i>完成 '+pct+'%</span></div>'
         + '<div class="who">負責人：'+(names.length ? '<b>'+esc(names.join('、'))+'</b>' : '<span class="na">待填'+(seats>1?'（'+seats+' 人）':'')+'</span>')+'</div>'
         + '<div class="duty"><ul>'+String(r.duty||'').split(/[；;]/).map(function(x){ return x.trim(); }).filter(Boolean).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul>'
         + '<div class="sub">'+String(r.note||'').split('｜').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x){ return !/^甘特圖/.test(x); }).map(function(x){ return '<div>'+esc(x)+'</div>'; }).join('')+'</div></div>'
-        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這位子的工作</button></div>'
-        + '<div class="assign">'+Array.apply(null,{length:seats}).map(function(_,i){ return '<input placeholder="'+(seats>1?'負責人 '+(i+1):'填負責人名字')+'" maxlength="12" value="'+esc(names[i]||'')+'">'; }).join('')+'<button class="btn primary">儲存</button><span class="msg"></span></div>';
+        + '<div class="go"><button class="btn" data-go="'+esc(r.role)+'">看這位子的工作</button></div>';
       if(r.role.replace(/\s/g,'')==='統籌') el.querySelector('.top b').addEventListener('dblclick', openHoursDlg);
-      var inps=el.querySelectorAll('.assign input'), sbtn=el.querySelector('.assign .btn'), am=el.querySelector('.assign .msg');
-      function doAssign(){
-        var v=[].map.call(inps,function(x){ return x.value.trim(); }).filter(Boolean).join('、'); if(v===(r.person||'')) return;
-        am.innerHTML='<span class="saving">儲存中…</span>'; sbtn.disabled=true;
-        pushAssign(r.role, v).then(function(res){
-          if(res.roles) state.roles=res.roles;
-          if(res.tasks) setTasks(res.tasks);
-          state.serverTime=res.serverTime||state.serverTime; renderAll();
-        }).catch(function(err){ am.innerHTML='<span class="err">'+esc(err.message)+'</span>'; sbtn.disabled=false; });
-      }
-      sbtn.addEventListener('click', doAssign);
-      [].forEach.call(inps, function(x){ x.addEventListener('keydown', function(e){ if(e.key==='Enter') doAssign(); }); });
       box.appendChild(el);
     });
   }
@@ -589,7 +564,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
         + '<td><span class="hours"><input class="hrs" type="number" min="0" step="0.5" value="'+esc(t.hours===''||t.hours==null?'':t.hours)+'" placeholder="自填"> 小時</span></td>'
         + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
-        + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成','延遲'].map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
+        + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成'].concat(t.status==='延遲'?['延遲']:[]).map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
         + '<td class="out">'+esc(t.output||'無')+'</td>'
         + '<td><textarea class="note" placeholder="備註…">'+esc(t.note||'')+'</textarea></td>'
         + '<td><div class="by">'+(t.by ? esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16)) : '—')+'</div><div class="msg"></div></td>';
