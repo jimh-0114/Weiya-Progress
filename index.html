@@ -147,7 +147,8 @@
   select.status.進行中{border-color:var(--s-doing);color:var(--s-doing)}
   select.status.已完成{border-color:var(--s-done);color:var(--s-done)}
   select.status.延遲{border-color:var(--s-late);color:var(--s-late)}
-  input.pct{width:70px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);text-align:right}
+  td.out{text-align:left;font-size:14px;line-height:1.6;white-space:pre-wrap}
+  td.out .na{color:var(--ink-3)}
   textarea.note{width:100%;min-height:44px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);resize:vertical;line-height:1.5;text-align:left}
   td .by{font-size:13px;color:var(--ink-2);line-height:1.5}
   td .msg{font-size:13px;margin-top:4px}
@@ -266,18 +267,17 @@
 
   <!-- 填進度 -->
   <section class="page" id="page-tasks">
-    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、預估時數、狀態、完成％或備註後會自動存檔。工作依預計完成日排序，還沒排日期的在最後</span></div>
+    <div class="sec-h"><h2>填進度</h2><span class="hint">先在右上角填名字；改日期、預估時數、狀態或備註後會自動存檔；完成率依「已完成」的工作計算。工作依預計完成日排序，還沒排日期的在最後</span></div>
     <div class="filters" id="filters">
       <button class="chip on" data-role="">全部</button>
       <span class="sp"></span>
-      <label><input type="checkbox" id="showMore"> 顯示產出</label>
       <label><input type="checkbox" id="hideDone"> 隱藏已完成</label>
       <button class="btn primary" id="addTask">＋ 新增工作</button>
     </div>
     <div class="twrap"><table id="taskTable">
-      <colgroup><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:100px"><col style="width:220px"><col style="width:120px"></colgroup>
+      <colgroup><col><col style="width:150px"><col style="width:130px"><col style="width:160px"><col style="width:110px"><col style="width:180px"><col style="width:220px"><col style="width:120px"></colgroup>
       <thead><tr>
-        <th>工作項目</th><th>負責位子</th><th>預估時數</th><th>預計</th><th>狀態</th><th>完成%</th><th>備註</th><th>更新</th>
+        <th>工作項目</th><th>負責位子</th><th>預估時數</th><th>預計</th><th>狀態</th><th>主要產出</th><th>備註</th><th>更新</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
@@ -478,7 +478,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
 
   // ── 計算 ──
-  function effPct(t){ return t.status==='已完成' ? 100 : Math.max(0, Math.min(100, t.pct)); }
+  function effPct(t){ return t.status==='已完成' ? 100 : 0; }
   function isLate(t){ return t.status!=='已完成' && t.endD && t.endD < today(); }
   function roleKeys(t){ return String(t.role||'').replace(/＋/g,'、').split(/[、,]/).map(function(x){return x.replace(/\s/g,'');}).filter(Boolean); }
   function roleMatch(t, role){
@@ -527,10 +527,10 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     $('ov-due').innerHTML = due.map(function(t){ var l=isLate(t); return '<li><span>'+esc(t.name)+'</span><span class="when '+(l?'late':'')+'">'+fmt(t.endD)+' · '+esc(leftText(t))+'</span></li>'; }).join('') || '<li class="empty">全部完成</li>';
 
     var dg = ts.filter(function(t){ return t.status==='進行中'; });
-    $('ov-doing').innerHTML = dg.map(function(t){ return '<li><span>'+esc(t.name)+(t.person?' · '+esc(t.person):'')+'</span><span class="when">'+effPct(t)+'%</span></li>'; }).join('') || '<li class="empty">目前沒有進行中的項目</li>';
+    $('ov-doing').innerHTML = dg.map(function(t){ return '<li><span>'+esc(t.name)+(t.person?' · '+esc(t.person):'')+'</span></li>'; }).join('') || '<li class="empty">目前沒有進行中的項目</li>';
 
     var rc = ts.filter(function(t){ return t.at; }).sort(function(a,b){ return String(b.at).localeCompare(String(a.at)); }).slice(0,6);
-    $('ov-recent').innerHTML = rc.map(function(t){ return '<li><span>'+esc(t.name)+' → '+esc(t.status)+' '+effPct(t)+'%</span><span class="when">'+esc(t.by)+' '+esc(String(t.at).slice(5,16))+'</span></li>'; }).join('') || '<li class="empty">還沒有人更新</li>';
+    $('ov-recent').innerHTML = rc.map(function(t){ return '<li><span>'+esc(t.name)+' → '+esc(t.status)+'</span><span class="when">'+esc(t.by)+' '+esc(String(t.at).slice(5,16))+'</span></li>'; }).join('') || '<li class="empty">還沒有人更新</li>';
   }
 
   // ── 分工比例 ──
@@ -579,22 +579,21 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   // ── 填進度 ──
   function renderRows(){
     var tb = $('rows'); tb.innerHTML='';
-    $('taskTable').classList.toggle('showmore', showMore);
     state.tasks.forEach(function(t){
       if(filterRole && !roleMatch(t, filterRole)) return;
       if(hideDone && t.status==='已完成') return;
       var late = isLate(t);
       var tr = document.createElement('tr'); tr.className = (late?'late ':'')+(t.status==='已完成'?'done':'');
       tr.innerHTML =
-        '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><div class="more">產出：'+esc(t.output||'')+'</div><button class="edit" type="button">修改</button></td>'
+        '<td><div class="name">'+esc(t.name)+'</div><div class="detail">'+esc(t.detail||'')+'</div><button class="edit" type="button">修改</button></td>'
         + '<td>'+esc(t.role||'')+(t.person?'<div class="by">'+esc(t.person)+'</div>':'')+'</td>'
         + '<td><span class="hours"><input class="hrs" type="number" min="0" step="0.5" value="'+esc(t.hours===''||t.hours==null?'':t.hours)+'" placeholder="自填"> 小時</span></td>'
         + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
         + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成','延遲'].map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
-        + '<td><input class="pct" type="number" min="0" max="100" step="5" value="'+effPct(t)+'"></td>'
+        + '<td class="out">'+(t.output?esc(t.output):'<span class="na">未填</span>')+'</td>'
         + '<td><textarea class="note" placeholder="備註…">'+esc(t.note||'')+'</textarea></td>'
         + '<td><div class="by">'+(t.by ? esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16)) : '—')+'</div><div class="msg"></div></td>';
-      var sel=tr.querySelector('select'), pct=tr.querySelector('input.pct'), note=tr.querySelector('textarea'), msg=tr.querySelector('.msg'), hrs=tr.querySelector('input.hrs');
+      var sel=tr.querySelector('select'), note=tr.querySelector('textarea'), msg=tr.querySelector('.msg'), hrs=tr.querySelector('input.hrs');
       var dS=tr.querySelector('.d-start'), dE=tr.querySelector('.d-end');
       function commitDates(){
         var me=(meInput.value||'').trim();
@@ -623,16 +622,13 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       function commit(){
         var me=(meInput.value||'').trim();
         if(!me){ meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
-        t.status=sel.value; t.pct=Number(pct.value)||0; t.note=note.value; t.hours=hrs.value===''?'':Number(hrs.value);
-        if(t.status==='已完成'){ t.pct=100; pct.value=100; }
-        else if(t.status==='未開始' && t.pct>0){ t.status='進行中'; sel.value='進行中'; }
+        t.status=sel.value; t.pct=t.status==='已完成'?100:0; t.note=note.value; t.hours=hrs.value===''?'':Number(hrs.value);
         t.by=me; var n=new Date(); t.at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
         sel.className='status '+t.status;
         msg.innerHTML='<span class="saving">儲存中…</span>';
         pushUpdate(t).then(function(res){ savedRow(res); }).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; });
       }
       sel.addEventListener('change', commit);
-      pct.addEventListener('change', commit);
       hrs.addEventListener('change', commit);
       note.addEventListener('blur', function(){ if(note.value !== (t.note||'')) commit(); });
       tb.appendChild(tr);
@@ -659,7 +655,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       var span = Math.round((e-t.startD)/86400000);
       row.innerHTML='<div class="lab" title="'+esc(t.name)+'">'+esc(t.name)+'</div><div class="track"><div class="bar '+st+'" style="left:'+l+'%;width:'+w+'%"><i style="width:'+effPct(t)+'%"></i></div></div>';
       var bar=row.querySelector('.bar');
-      bar.dataset.tip='<b>'+esc(t.name)+'</b><br>'+fmtFull(t.startD)+' → '+fmtFull(t.endD)+'（'+span+' 天）<br>'+esc(t.status)+' '+effPct(t)+'%'+(t.person?' · '+esc(t.person):'')+(leftText(t)?' · '+esc(leftText(t)):'');
+      bar.dataset.tip='<b>'+esc(t.name)+'</b><br>'+fmtFull(t.startD)+' → '+fmtFull(t.endD)+'（'+span+' 天）<br>'+esc(t.status)+(t.person?' · '+esc(t.person):'')+(leftText(t)?' · '+esc(leftText(t)):'');
       body.appendChild(row);
     });
     var tx=(today()-T0)/total;
@@ -790,7 +786,6 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var g=e.target.closest('[data-go]'); if(g){ filterRole=g.dataset.go; renderAll(); showPage('tasks'); }
   });
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
-  $('showMore').addEventListener('change', function(){ showMore=this.checked; renderRows(); });
   $('reload').addEventListener('click', load);
   (function(){
     var tip=$('gtip'), g=$('gantt');
@@ -817,8 +812,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var linked = t ? itemsOfTask(t.id).filter(function(x){ return x!==outItem; }) : [];
     linkOrig = linked.map(function(x){ return x.id; }).join('、');
     var src=$('f-outSrc'), others=(state.items||[]).filter(function(x){ return x!==outItem; });
-    src.innerHTML='<option value="">自行輸入</option>'+(others.length?'<optgroup label="從物品清單選">'+others.map(function(x){ return '<option value="'+esc(x.id)+'">'+esc(x.name)+(x.scene?'（'+esc(x.scene)+'）':'')+'</option>'; }).join('')+'</optgroup>':'');
-    src.value = !outItem && linked.length ? linked[0].id : '';
+    src.innerHTML='<option value="">自行輸入</option><option value="__none">無</option>'+(others.length?'<optgroup label="從物品清單選">'+others.map(function(x){ return '<option value="'+esc(x.id)+'">'+esc(x.name)+(x.scene?'（'+esc(x.scene)+'）':'')+'</option>'; }).join('')+'</optgroup>':'');
+    src.value = !outItem && linked.length ? linked[0].id : (t && t.output==='無' ? '__none' : '');
     outMode();
     $('taskDlg').showModal();
   }
@@ -826,17 +821,18 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   // outItem＝自行輸入並勾同步後，在物品清單產生的那一項（物品的「產出自」＝工作編號）
   var linkIds=[], linkOrig='', outItem=null;
   $('f-sync').addEventListener('change', function(){ $('f-design').disabled=!this.checked; if(!this.checked) $('f-design').checked=false; });
-  function pickedItem(){ var v=$('f-outSrc').value; return v ? state.items.filter(function(x){ return x.id===v; })[0] : null; }
+  function noOutput(){ return $('f-outSrc').value==='__none'; }
+  function pickedItem(){ var v=$('f-outSrc').value; return v && v!=='__none' ? state.items.filter(function(x){ return x.id===v; })[0] : null; }
   function outMode(){
     var it=pickedItem();
-    $('f-typeBox').hidden=!!it;
+    $('f-typeBox').hidden=!!it || noOutput();
     linkIds = it ? [it.id] : [];
   }
   $('f-outSrc').addEventListener('change', outMode);
   // 工作存好後，再寫物品清單：先處理選來的物品，再處理主要產出那一項
   function syncTaskItems(taskId, t){
     var p=Promise.resolve();
-    var syncing = !pickedItem() && $('f-sync').checked;
+    var syncing = !pickedItem() && !noOutput() && $('f-sync').checked;
     var keep = outItem && syncing ? [outItem.id] : [];
     if(linkIds.join('、')!==linkOrig) p=p.then(function(){ return pushLink(taskId, linkIds.concat(keep)); }).then(itemsBack);
     if(syncing){
@@ -883,8 +879,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var st=$('f-start').value, en=$('f-end').value;
     if(st && en && en<st){ msg.innerHTML='<span class="err">結束不能早於開始</span>'; return; }
     var n=new Date(), at=n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes());
-    var payload={ name:name, detail:$('f-detail').value.trim(), output:(pickedItem()?pickedItem().name:$('f-output').value.trim()), role:$('f-role').value, hours:$('f-hours').value===''?'':Number($('f-hours').value), start:st, end:en, by:me, at:at };
-    if(!pickedItem() && $('f-sync').checked && !payload.output){ msg.innerHTML='<span class="err">要同步到物品清單，請先填主要產出</span>'; return; }
+    var payload={ name:name, detail:$('f-detail').value.trim(), output:(noOutput()?'無':pickedItem()?pickedItem().name:$('f-output').value.trim()), role:$('f-role').value, hours:$('f-hours').value===''?'':Number($('f-hours').value), start:st, end:en, by:me, at:at };
+    if(!pickedItem() && !noOutput() && $('f-sync').checked && !payload.output){ msg.innerHTML='<span class="err">要同步到物品清單，請先填主要產出</span>'; return; }
     msg.innerHTML='<span class="saving">儲存中…</span>'; $('taskSave').disabled=true;
     var pr;
     if(editing){ Object.assign(editing, payload); normTask(editing); pr=pushEdit(editing); }
