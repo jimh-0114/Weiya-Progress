@@ -590,7 +590,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         + '<td><span class="hours"><input class="hrs" type="number" min="0" step="0.5" value="'+esc(t.hours===''||t.hours==null?'':t.hours)+'" placeholder="自填"> 小時</span></td>'
         + '<td><span class="dates"><input type="date" class="d-start" value="'+iso(t.startD)+'" title="預計開始"><input type="date" class="d-end" value="'+iso(t.endD)+'" title="預計完成"></span><span class="left '+(late?'warn':'')+'">'+esc(leftText(t))+'</span></td>'
         + '<td><select class="status '+esc(t.status)+'">'+['未開始','進行中','已完成','延遲'].map(function(s){ return '<option'+(s===t.status?' selected':'')+'>'+s+'</option>'; }).join('')+'</select></td>'
-        + '<td class="out">'+(t.output?esc(t.output):'<span class="na">未填</span>')+'</td>'
+        + '<td class="out">'+esc(t.output||'無')+'</td>'
         + '<td><textarea class="note" placeholder="備註…">'+esc(t.note||'')+'</textarea></td>'
         + '<td><div class="by">'+(t.by ? esc(t.by)+'<br>'+esc(String(t.at||'').slice(0,16)) : '—')+'</div><div class="msg"></div></td>';
       var sel=tr.querySelector('select'), note=tr.querySelector('textarea'), msg=tr.querySelector('.msg'), hrs=tr.querySelector('input.hrs');
