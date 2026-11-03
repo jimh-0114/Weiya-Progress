@@ -284,8 +284,7 @@
 
   <!-- 物品清單 -->
   <section class="page" id="page-items">
-    <div class="sec-h"><h2>物品清單</h2><span class="hint">活動要用的道具、文宣品、備品；要設計組做的請勾選</span></div>
-    <div class="isum" id="isum"></div>
+    <div class="sec-h"><h2>物品清單</h2><span class="hint">活動要用的道具、文宣品、備品<span id="isum"></span></span></div>
     <div class="filters" id="ifilters">
       <button class="chip on" data-scene="">全部</button>
       <button class="chip" data-scene="戶外">戶外</button>
@@ -659,7 +658,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   function renderItems(){
     var all=state.items||[], dz=all.filter(function(x){ return x.design==='要'; }).length;
-    $('isum').textContent = all.length ? '共 '+all.length+' 項 · 要設計組做 '+dz+' 項' : '';
+    $('isum').textContent = all.length ? '：共 '+all.length+' 項，要設計組做 '+dz+' 項' : '';
     document.querySelectorAll('#ifilters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.scene||'')===itemScene); });
     var tb=$('irows'); tb.innerHTML='';
     all.forEach(function(it){
