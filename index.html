@@ -130,7 +130,7 @@
   td.id{font-weight:700;white-space:nowrap;color:var(--red)}
   td .name{font-weight:700;font-size:16px}
   td .detail{font-size:14px;color:var(--ink-2);margin-top:4px;line-height:1.65}
-  td .more{font-size:13px;color:var(--ink-3);margin-top:4px;display:none}
+  td .more{font-size:13px;color:var(--ink-3);margin-top:4px;display:none;white-space:pre-wrap}
   .showmore td .more{display:block}
   .load{display:inline-block;padding:3px 12px;border-radius:99px;font-size:13.5px;white-space:nowrap;font-weight:500}
   .load.高{background:#F9C9A3;color:#7A3A10}.load.中{background:#FBE3B8;color:#7A5200}.load.低{background:#D4E8F5;color:#1F4566}
@@ -322,7 +322,7 @@
   <div class="frm">
     <label>工作項目<input id="f-name" maxlength="40" placeholder="例：確認遊覽車報價"></label>
     <label>工作細項／說明<textarea id="f-detail" rows="2" placeholder="要做什麼、做到什麼程度"></textarea></label>
-    <label>主要產出<input id="f-output" maxlength="40" placeholder="例：報價比較表"></label>
+    <label>主要產出<textarea id="f-output" rows="2" placeholder="例：報價比較表（可換行）"></textarea></label>
     <div class="two">
       <label>負責位子<select id="f-role"></select></label>
       <label>預估時數（小時）<input id="f-hours" type="number" min="0" step="0.5" placeholder="可先空著"></label>
