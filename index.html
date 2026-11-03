@@ -324,7 +324,7 @@
     <div class="specbox" id="i-specBox" hidden>
       <div class="three">
         <label>品項<select id="i-prod"></select></label>
-        <label>款式<select id="i-var"></select></label>
+        <label><span id="i-varLbl">款式</span><select id="i-var"></select><input id="i-other" maxlength="60" placeholder="例：A5 傳單，雙面彩色" hidden></label>
       </div>
       <div class="dl" id="i-dl"></div>
     </div>
@@ -720,12 +720,15 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   // 規格存成「品項｜款式」（舊資料「分類｜品項｜款式」也讀得懂）
   function specParts(s){ var a=String(s||'').split('｜'); return a.length>=3 ? a.slice(1) : a; }
-  function specShort(s){ return specParts(s).filter(Boolean).join('｜'); }
+  function specShort(s){ var a=specParts(s); return a[0]==='其他' ? (a[1]||'') : a.filter(Boolean).join('｜'); }
   function specOpts(list, label){ return '<option value="">'+label+'</option>'+list.map(function(x,i){ return '<option value="'+i+'">'+esc(x[0])+'</option>'; }).join(''); }
+  var SPEC_OTHER='其他';
+  function isOther(){ return $('i-prod').value==='other'; }
   function specProd(){ return SPECS[$('i-prod').value] || null; }
   function specVar(){ var p=specProd(); return p ? p[1][$('i-var').value] : null; }
   function specFill(level){
     if(level<=1){ $('i-var').innerHTML=specProd()?specOpts(specProd()[1],'請選擇'):'<option value="">先選品項</option>'; }
+    var o=isOther(); $('i-var').hidden=o; $('i-other').hidden=!o; $('i-varLbl').textContent=o?'自己填':'款式';
     var v=specVar();
     var dl = v && v[1].length ? '公版下載：'+v[1].map(function(f){ return '<a href="'+SPEC_BASE+encodeURIComponent(f)+'" target="_blank" rel="noopener">'+(/-cd\.zip$/i.test(f)?'CorelDRAW':(/-ai\.zip$/i.test(f)?'AI':'下載'))+'</a>'; }).join('')+'　' : '';
     $('i-dl').innerHTML = dl + '不知道選哪個？<a href="'+SPEC_SITE+'" target="_blank" rel="noopener">看規格網站</a>';
@@ -734,10 +737,13 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var a=specParts(s), pi=-1, vi=-1;
     SPECS.forEach(function(p,i){ if(pi<0 && p[0]===a[0]) pi=i; });
     if(pi>=0) SPECS[pi][1].forEach(function(v,i){ if(vi<0 && v[0]===a[1]) vi=i; });
-    $('i-prod').innerHTML=specOpts(SPECS,'請選擇'); $('i-prod').value=pi>=0?String(pi):''; specFill(1);
+    $('i-prod').innerHTML=specOpts(SPECS,'請選擇')+'<option value="other">其他（自己填）</option>';
+    var other=a[0]===SPEC_OTHER; $('i-other').value=other?(a[1]||''):'';
+    $('i-prod').value=other?'other':(pi>=0?String(pi):''); specFill(1);
     $('i-var').value=vi>=0?String(vi):''; specFill(2);
   }
   function specGet(){
+    if(isOther()){ var t=$('i-other').value.replace(/｜/g,'/').trim(); return t ? SPEC_OTHER+'｜'+t : ''; }
     var p=specProd(), v=specVar();
     return p ? p[0]+(v?'｜'+v[0]:'') : '';
   }
