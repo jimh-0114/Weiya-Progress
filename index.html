@@ -202,7 +202,7 @@
   dialog .frm label.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);cursor:pointer}
   dialog .frm label.chk input{display:inline-block;width:auto;margin:0}
   [hidden]{display:none!important}
-  #itemTable{min-width:1200px}
+  #itemTable{min-width:1000px}
   #itemTable td.itask{text-align:left;font-size:14px;line-height:1.6}
   .fitems{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 8px}
   .fitems .it{display:inline-flex;align-items:center;gap:6px;padding:3px 6px 3px 12px;border-radius:99px;background:#E8F0F8;font-size:14px}
@@ -306,8 +306,8 @@
       <button class="btn primary" id="addItem">＋ 新增物品</button>
     </div>
     <div class="twrap"><table id="itemTable">
-      <colgroup><col style="width:200px"><col style="width:80px"><col style="width:80px"><col><col style="width:200px"><col style="width:90px"><col style="width:110px"><col style="width:200px"><col style="width:110px"></colgroup>
-      <thead><tr><th>物品</th><th>數量</th><th>場次</th><th>用途</th><th>相關工作</th><th>設計組</th><th>需要日期</th><th>備註</th><th>填寫</th></tr></thead>
+      <colgroup><col style="width:200px"><col style="width:80px"><col style="width:80px"><col><col style="width:90px"><col style="width:110px"><col style="width:200px"><col style="width:110px"></colgroup>
+      <thead><tr><th>物品</th><th>數量</th><th>場次</th><th>相關工作</th><th>設計組</th><th>需要日期</th><th>備註</th><th>填寫</th></tr></thead>
       <tbody id="irows"></tbody>
     </table></div>
   </section>
@@ -321,7 +321,6 @@
       <label>數量<input id="i-qty" type="number" min="0" step="1" placeholder="可先空著"></label>
       <label>場次<select id="i-scene"><option>戶外</option><option>餐會</option><option>共用</option></select></label>
     </div>
-    <label>用途<input id="i-use" maxlength="60" placeholder="例：第二關計分用"></label>
     <div class="two">
       <label>需要日期<input id="i-need" type="date"></label>
       <label class="chk" style="margin-top:26px"><input id="i-design" type="checkbox"> 要請設計組做</label>
@@ -694,7 +693,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       if(onlyDesign && it.design!=='要') return;
       var tr=document.createElement('tr');
       tr.innerHTML='<td><div class="name">'+esc(it.name)+'</div><button class="edit" type="button">修改</button></td>'
-        +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td><td class="use">'+esc(it.use)+'</td>'
+        +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td>'
         +'<td class="itask">'+(taskNames(it.tasks).map(esc).join('<br>')||'—')+'</td>'
         +'<td>'+(it.design==='要'?'<span class="dz">要做</span>':'—')+'</td>'
         +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+esc(it.note)+'</td>'
@@ -702,7 +701,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       tr.querySelector('.edit').addEventListener('click', function(){ openItemDlg(it); });
       tb.appendChild(tr);
     });
-    if(!tb.children.length) tb.innerHTML='<tr><td colspan="9" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
+    if(!tb.children.length) tb.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
   }
   function idList(s){ return String(s||'').split(/[、,，\s]+/).filter(Boolean); }
   function taskNames(s){ return idList(s).map(function(id){ var t=state.tasks.filter(function(x){ return x.id===id; })[0]; return t?t.name:''; }).filter(Boolean); }
@@ -728,7 +727,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     $('itemDlgTitle').textContent = it?'修改物品':'新增物品';
     $('itemDelete').style.display = it?'':'none';
     $('i-name').value=it?it.name:''; $('i-qty').value=it&&it.qty!==''?it.qty:'';
-    $('i-scene').value=it?(it.scene||'戶外'):(itemScene||'戶外'); $('i-use').value=it?(it.use||''):'';
+    $('i-scene').value=it?(it.scene||'戶外'):(itemScene||'戶外');
     $('i-need').value=it&&it.need?iso(toDate(it.need)):''; $('i-design').checked=!!(it&&it.design==='要');
     $('i-note').value=it?(it.note||''):'';
     $('i-msg').innerHTML=''; $('itemSave').disabled=false; $('itemDelete').disabled=false;
@@ -748,7 +747,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
     var name=$('i-name').value.trim(); if(!name){ msg.innerHTML='<span class="err">請填物品名稱</span>'; return; }
     var n=new Date();
-    var it={ id:editingItem?editingItem.id:'', name:name, qty:$('i-qty').value===''?'':Number($('i-qty').value), scene:$('i-scene').value, use:$('i-use').value.trim(),
+    var it={ id:editingItem?editingItem.id:'', name:name, qty:$('i-qty').value===''?'':Number($('i-qty').value), scene:$('i-scene').value, use:editingItem?(editingItem.use||''):'',
       design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me, tasks:editingItem?(editingItem.tasks||''):'', src:editingItem?(editingItem.src||''):'',
       at:n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes()) };
     msg.innerHTML='<span class="saving">儲存中…</span>'; $('itemSave').disabled=true;
@@ -843,7 +842,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(syncing){
       var role=t.role||'', it={
         id: outItem?outItem.id:'', name: t.output.replace(/\s*\n\s*/g,'、'), scene: /戶外/.test(role)?'戶外':(/餐會/.test(role)?'餐會':'共用'),
-        use: t.name, need: t.end||'', design: $('f-design').checked?'要':'', src: taskId, by: t.by,
+        use: outItem?(outItem.use||''):'', need: t.end||'', design: $('f-design').checked?'要':'', src: taskId, by: t.by,
         qty: outItem?outItem.qty:'', note: outItem?(outItem.note||''):'',
         tasks: outItem ? (idList(outItem.tasks).indexOf(taskId)<0 ? idList(outItem.tasks).concat([taskId]).join('、') : outItem.tasks) : taskId
       };
