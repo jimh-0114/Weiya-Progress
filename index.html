@@ -192,6 +192,15 @@
   .ptable th:first-child,.ptable td:first-child{text-align:left}
   .ptable th{background:#E8F0F8;color:var(--red-dk);position:static}
   .ptable tr.na td{color:var(--ink-3)}
+  /* 物品清單 */
+  #itemTable{min-width:1000px}
+  #itemTable td{text-align:center}
+  #itemTable td:first-child{text-align:left}
+  #itemTable td.use,#itemTable td.inote{text-align:left;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap}
+  .dz{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13.5px;background:#FBE3B8;color:#7A5200;font-weight:500;white-space:nowrap}
+  .isum{text-align:center;font-size:14.5px;color:var(--ink-2);margin:-6px 0 14px}
+  dialog .frm label.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);cursor:pointer}
+  dialog .frm label.chk input{display:inline-block;width:auto;margin:0}
   @media (max-width:640px){header h1{font-size:20px}header .sp{display:none}header .in > div:first-child{flex-basis:100%}.tile b{font-size:26px}.rlist li{grid-template-columns:100px 1fr 44px}}
 </style>
 </head>
@@ -209,6 +218,7 @@
     <button data-page="roles">分工比例</button>
     <button data-page="tasks">填進度</button>
     <button data-page="timeline">時程</button>
+    <button data-page="items">物品清單</button>
   </nav>
 </header>
 
@@ -266,7 +276,46 @@
       <div class="g-legend"><span><i style="background:var(--s-done)"></i>已完成％</span><span><i style="background:#CFE6D6"></i>未完成</span><span><i style="background:#F6D3CE"></i>逾期未完成</span></div>
     </div>
   </section>
+
+  <!-- 物品清單 -->
+  <section class="page" id="page-items">
+    <div class="sec-h"><h2>物品清單</h2><span class="hint">活動要用的道具、文宣品、備品都列在這裡；要設計組做的請勾選</span></div>
+    <div class="isum" id="isum"></div>
+    <div class="filters" id="ifilters">
+      <button class="chip on" data-scene="">全部</button>
+      <button class="chip" data-scene="戶外">戶外</button>
+      <button class="chip" data-scene="餐會">餐會</button>
+      <button class="chip" data-scene="共用">共用</button>
+      <span class="sp"></span>
+      <label><input type="checkbox" id="onlyDesign"> 只看要設計組做的</label>
+      <button class="btn primary" id="addItem">＋ 新增物品</button>
+    </div>
+    <div class="twrap"><table id="itemTable">
+      <colgroup><col style="width:200px"><col style="width:80px"><col style="width:80px"><col><col style="width:90px"><col style="width:110px"><col style="width:200px"><col style="width:110px"></colgroup>
+      <thead><tr><th>物品</th><th>數量</th><th>場次</th><th>用途</th><th>設計組</th><th>需要日期</th><th>備註</th><th>填寫</th></tr></thead>
+      <tbody id="irows"></tbody>
+    </table></div>
+  </section>
 </main>
+
+<dialog id="itemDlg">
+  <h2 id="itemDlgTitle">新增物品</h2>
+  <div class="frm">
+    <label>物品名稱<input id="i-name" maxlength="40" placeholder="例：闖關卡"></label>
+    <div class="two">
+      <label>數量<input id="i-qty" type="number" min="0" step="1" placeholder="可先空著"></label>
+      <label>場次<select id="i-scene"><option>戶外</option><option>餐會</option><option>共用</option></select></label>
+    </div>
+    <label>用途<input id="i-use" maxlength="60" placeholder="例：第二關計分用"></label>
+    <div class="two">
+      <label>需要日期<input id="i-need" type="date"></label>
+      <label class="chk" style="margin-top:26px"><input id="i-design" type="checkbox"> 要請設計組做</label>
+    </div>
+    <label>備註<textarea id="i-note" rows="2" placeholder="尺寸、文字內容、參考圖等"></textarea></label>
+    <div class="msg" id="i-msg"></div>
+  </div>
+  <div class="row"><button class="btn danger" id="itemDelete" type="button">刪除這項物品</button><span style="flex:1"></span><button class="btn" id="itemCancel">取消</button><button class="btn primary" id="itemSave">儲存</button></div>
+</dialog>
 
 <dialog id="taskDlg">
   <h2 id="taskDlgTitle">新增工作</h2>
@@ -307,7 +356,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function ls(k, v){ try{ if(v===undefined) return localStorage.getItem(KEY+k); localStorage.setItem(KEY+k, v); }catch(e){ return null; } }
   var GAS = DEFAULT_GAS_URL.trim();
   var demo = !GAS;
-  var state = { tasks: [], roles: [], serverTime: '' };
+  var state = { tasks: [], roles: [], items: [], serverTime: '' };
   var filterRole = '', hideDone = false, showMore = false;
   var EVENT = new Date(2027, 0, 15), T0 = new Date(2026, 8, 22), T1 = new Date(2027, 1, 6);
   var $ = function(id){ return document.getElementById(id); };
@@ -367,7 +416,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var base = JSON.parse(JSON.stringify(SEED));
     var rs={}; try{ rs=JSON.parse(ls('roles')||'{}'); }catch(e){}
     base.roles.forEach(function(r){ var k=r.role.replace(/\s/g,''); if(rs[k]) r.person=rs[k]; });
-    return Promise.resolve({ ok:true, tasks: tasks||base.tasks, roles: base.roles, serverTime: '展示模式' });
+    var items=[]; try{ items=JSON.parse(ls('items')||'[]'); }catch(e){}
+    return Promise.resolve({ ok:true, tasks: tasks||base.tasks, roles: base.roles, items: items, serverTime: '展示模式' });
   }
   function demoResp(){
     state.tasks.forEach(function(t){ t.person=personsForTask(t); });
@@ -604,23 +654,100 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var mode=$('mode'), notice=$('notice');
     if(demo){ mode.textContent='展示模式（未連線）'; mode.className='badge demo'; notice.className='notice on'; notice.textContent='目前是展示模式：資料來自甘特圖檔案，填寫只會存在這台電腦。'; }
     else { mode.textContent='已連線試算表'; mode.className='badge'; notice.className='notice'; }
-    renderOverview(); renderRoles(); renderRows(); renderGantt();
-    document.querySelectorAll('.filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
+    renderOverview(); renderRoles(); renderRows(); renderGantt(); renderItems();
+    document.querySelectorAll('.filters .chip[data-role]').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
   }
+  // ── 物品清單 ──
+  var itemScene='', onlyDesign=false, editingItem=null;
+  function setItems(list){
+    state.items=(list||[]).slice().sort(function(a,b){
+      var an=a.need||'9999', bn=b.need||'9999'; if(an!==bn) return an<bn?-1:1;
+      return String(a.id).localeCompare(String(b.id));
+    });
+  }
+  function renderItems(){
+    var all=state.items||[], dz=all.filter(function(x){ return x.design==='要'; }).length;
+    $('isum').textContent = all.length ? '共 '+all.length+' 項 · 要設計組做 '+dz+' 項' : '';
+    document.querySelectorAll('#ifilters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.scene||'')===itemScene); });
+    var tb=$('irows'); tb.innerHTML='';
+    all.forEach(function(it){
+      if(itemScene && it.scene!==itemScene) return;
+      if(onlyDesign && it.design!=='要') return;
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td><div class="name">'+esc(it.name)+'</div><button class="edit" type="button">修改</button></td>'
+        +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td><td class="use">'+esc(it.use)+'</td>'
+        +'<td>'+(it.design==='要'?'<span class="dz">要做</span>':'—')+'</td>'
+        +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+esc(it.note)+'</td>'
+        +'<td><div class="by">'+(it.by?esc(it.by)+'<br>'+esc(String(it.at||'').slice(5,16)):'—')+'</div></td>';
+      tr.querySelector('.edit').addEventListener('click', function(){ openItemDlg(it); });
+      tb.appendChild(tr);
+    });
+    if(!tb.children.length) tb.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
+  }
+  function demoItems(){ ls('items', JSON.stringify(state.items)); return Promise.resolve({ ok:true, items:state.items, serverTime:'展示模式' }); }
+  function pushItem(it){
+    if(!demo) return jsonp({ action:'itemSave', id:it.id||'', name:it.name, qty:it.qty, scene:it.scene, use:it.use, design:it.design, need:it.need, note:it.note, by:it.by });
+    if(it.id){ state.items=state.items.map(function(x){ return x.id===it.id?it:x; }); }
+    else { var mx=0; state.items.forEach(function(x){ var m=/^B(\d+)$/.exec(x.id); if(m) mx=Math.max(mx,+m[1]); }); it.id='B'+(mx+1<10?'0':'')+(mx+1); state.items.push(it); }
+    return demoItems();
+  }
+  function pushItemDelete(it){
+    if(!demo) return jsonp({ action:'itemDelete', id:it.id, by:it.by });
+    state.items=state.items.filter(function(x){ return x.id!==it.id; }); return demoItems();
+  }
+  function openItemDlg(it){
+    editingItem=it||null;
+    $('itemDlgTitle').textContent = it?'修改物品':'新增物品';
+    $('itemDelete').style.display = it?'':'none';
+    $('i-name').value=it?it.name:''; $('i-qty').value=it&&it.qty!==''?it.qty:'';
+    $('i-scene').value=it?(it.scene||'戶外'):(itemScene||'戶外'); $('i-use').value=it?(it.use||''):'';
+    $('i-need').value=it&&it.need?iso(toDate(it.need)):''; $('i-design').checked=!!(it&&it.design==='要');
+    $('i-note').value=it?(it.note||''):'';
+    $('i-msg').innerHTML=''; $('itemSave').disabled=false; $('itemDelete').disabled=false;
+    $('itemDlg').showModal();
+  }
+  function itemDone(res){
+    if(!res.items){ throw new Error('後台還沒更新，請通知 Jim 重新部署 GAS'); }
+    setItems(res.items); state.serverTime=res.serverTime||state.serverTime; $('upd').textContent=state.serverTime||'—';
+    $('itemDlg').close(); renderItems();
+  }
+  $('ifilters').addEventListener('click', function(e){ var c=e.target.closest('.chip'); if(c){ itemScene=c.dataset.scene||''; renderItems(); } });
+  $('onlyDesign').addEventListener('change', function(){ onlyDesign=this.checked; renderItems(); });
+  $('addItem').addEventListener('click', function(){ openItemDlg(null); });
+  $('itemCancel').addEventListener('click', function(){ $('itemDlg').close(); });
+  $('itemSave').addEventListener('click', function(){
+    var me=(meInput.value||'').trim(), msg=$('i-msg');
+    if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
+    var name=$('i-name').value.trim(); if(!name){ msg.innerHTML='<span class="err">請填物品名稱</span>'; return; }
+    var n=new Date();
+    var it={ id:editingItem?editingItem.id:'', name:name, qty:$('i-qty').value===''?'':Number($('i-qty').value), scene:$('i-scene').value, use:$('i-use').value.trim(),
+      design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me,
+      at:n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes()) };
+    msg.innerHTML='<span class="saving">儲存中…</span>'; $('itemSave').disabled=true;
+    pushItem(it).then(itemDone).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('itemSave').disabled=false; });
+  });
+  $('itemDelete').addEventListener('click', function(){
+    if(!editingItem) return;
+    var me=(meInput.value||'').trim(), msg=$('i-msg');
+    if(!me){ msg.innerHTML='<span class="err">請先在右上角填名字</span>'; return; }
+    if(!confirm('確定刪除「'+editingItem.name+'」？')) return;
+    msg.innerHTML='<span class="saving">刪除中…</span>'; $('itemSave').disabled=true; $('itemDelete').disabled=true;
+    pushItemDelete({ id:editingItem.id, by:me }).then(itemDone).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('itemSave').disabled=false; $('itemDelete').disabled=false; });
+  });
   // 填進度時用：更新其他頁的數字，但不動填進度的表格
   function softRefresh(){
     $('upd').textContent = state.serverTime || '—';
     renderOverview(); renderRoles(); renderGantt();
-    document.querySelectorAll('.filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
+    document.querySelectorAll('.filters .chip[data-role]').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
   }
   function load(){
     $('mode').textContent='載入中…';
     fetchAll().then(function(res){
-      state.roles = res.roles||[]; setTasks(res.tasks); if(demo) state.tasks.forEach(function(t){ t.person=personsForTask(t); }); state.serverTime = res.serverTime||''; renderAll();
+      state.roles = res.roles||[]; setTasks(res.tasks); setItems(res.items); if(demo) state.tasks.forEach(function(t){ t.person=personsForTask(t); }); state.serverTime = res.serverTime||''; renderAll();
     }).catch(function(err){
       $('mode').textContent='連線失敗'; $('mode').className='badge demo';
       $('notice').className='notice on'; $('notice').textContent='無法連到試算表後台：'+err.message+'。請稍後按「重新整理」再試。以下先顯示檔案內的資料。';
-      if(SEED && !state.tasks.length){ setTasks(SEED.tasks); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); }
+      if(SEED && !state.tasks.length){ setTasks(SEED.tasks); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); renderItems(); }
     });
   }
 
@@ -632,7 +759,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   $('tabs').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) showPage(b.dataset.page); });
   document.addEventListener('click', function(e){
-    var c=e.target.closest('.filters .chip'); if(c){ filterRole=c.dataset.role||''; renderAll(); return; }
+    var c=e.target.closest('.filters .chip[data-role]'); if(c){ filterRole=c.dataset.role||''; renderAll(); return; }
     var g=e.target.closest('[data-go]'); if(g){ filterRole=g.dataset.go; renderAll(); showPage('tasks'); }
   });
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
