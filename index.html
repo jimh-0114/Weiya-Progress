@@ -211,7 +211,6 @@
   .fitems .it button:hover{color:var(--s-late)}
   .fitems .none{font-size:13.5px;color:var(--ink-3)}
   #f-typeBox textarea{display:block;width:100%;margin:-4px 0 6px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px;resize:vertical}
-  .fpicked{margin:-4px 0 12px;padding:8px 12px;border-radius:8px;background:#E8F0F8;font-size:14px;color:var(--ink-2)}
   dialog .frm .fsync{display:flex;gap:20px;flex-wrap:wrap;margin:0 0 10px}
   dialog .frm .fsync label.chk{margin:0}
   dialog .frm .fpick{display:flex;gap:8px;margin-bottom:10px}
@@ -343,7 +342,6 @@
       <textarea id="f-output" rows="2" placeholder="例：報價比較表（可換行）"></textarea>
       <div class="fsync"><label class="chk"><input id="f-sync" type="checkbox"> 同步到物品清單</label><label class="chk"><input id="f-design" type="checkbox"> 要請設計組做</label></div>
     </div>
-    <div class="fpicked" id="f-picked" hidden></div>
     <div class="two">
       <label>負責位子<select id="f-role"></select></label>
       <label>預估時數（小時）<input id="f-hours" type="number" min="0" step="0.5" placeholder="可先空著"></label>
@@ -832,8 +830,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function pickedItem(){ var v=$('f-outSrc').value; return v ? state.items.filter(function(x){ return x.id===v; })[0] : null; }
   function outMode(){
     var it=pickedItem();
-    $('f-typeBox').hidden=!!it; $('f-picked').hidden=!it;
-    if(it) $('f-picked').innerHTML=esc(it.name)+(it.qty!==''?' ×'+esc(it.qty):'')+' · 設計組：'+(it.design==='要'?'要做':'不用')+'<br>數量、設計組等要改，請到「物品清單」分頁';
+    $('f-typeBox').hidden=!!it;
     linkIds = it ? [it.id] : [];
   }
   $('f-outSrc').addEventListener('change', outMode);
