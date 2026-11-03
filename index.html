@@ -31,9 +31,9 @@
   header{background:#FBF7EE;color:var(--ink);box-shadow:0 2px 10px rgba(0,70,100,.10);position:sticky;top:0;z-index:20}
   header:after{content:"";display:block;height:6px;background:var(--stripe)}
   header .in{max-width:1400px;margin:0 auto;padding:12px 20px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  header h1{font-size:26px;letter-spacing:.08em;line-height:1.2;color:var(--red);font-weight:900}
-  header .eng{font-size:11px;letter-spacing:.35em;color:var(--gold);font-weight:700;line-height:1}
-  header .sub{font-size:13px;color:var(--ink-2);margin-top:2px}
+  header h1{font-size:30px;letter-spacing:.08em;line-height:1.2;color:var(--red-dk);font-weight:900}
+  header .eng{font-size:12.5px;letter-spacing:.35em;color:var(--gold);font-weight:700;line-height:1.2}
+  header .sub{font-size:14px;color:var(--ink);margin-top:4px;font-weight:500}
   header .sp{flex:1}
   .badge{font-size:12.5px;padding:4px 12px;border-radius:99px;background:#fff;color:var(--red);border:1px solid var(--lblue);white-space:nowrap}
   .badge.demo{background:var(--gold);color:#fff;border-color:var(--gold)}
@@ -47,9 +47,10 @@
   .btn.danger:hover{background:#FFF3F1}
   nav.tabs{max-width:1400px;margin:6px auto 0;padding:0 20px;display:flex;justify-content:center;gap:6px;overflow-x:auto;scrollbar-width:none}
   nav.tabs::-webkit-scrollbar{display:none}
-  nav.tabs button{background:transparent;border:0;color:var(--ink-2);padding:10px 22px;font-size:16px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
-  nav.tabs button:hover{color:var(--red)}
-  nav.tabs button.on{color:var(--red);border-bottom-color:var(--gold);font-weight:700}
+  nav.tabs{margin:10px auto 0;padding-bottom:10px}
+  nav.tabs button{background:transparent;border:0;color:var(--ink);padding:8px 22px;font-size:16.5px;font-weight:700;border-radius:99px;cursor:pointer;white-space:nowrap}
+  nav.tabs button:hover{color:var(--red);background:#EAF4FA}
+  nav.tabs button.on{color:#fff;background:var(--red)}
 
   /* ── 主體 ── */
   main{max-width:1400px;margin:0 auto;padding:24px 20px 80px}
@@ -58,8 +59,9 @@
   .notice.on{display:block}
   .sec-h{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 20px;text-align:center}
   .sec-h h2{font-size:28px;color:var(--red);font-weight:900;letter-spacing:.08em}
-  .sec-h h2:after{content:"";display:block;width:56px;height:3px;background:var(--gold);margin:8px auto 0;border-radius:2px}
-  .sec-h .hint{font-size:14px;color:var(--ink-2);max-width:720px}
+  .sec-h h2{color:var(--red-dk)}
+  .sec-h h2:after{content:"";display:block;width:84px;height:5px;background:var(--gold);margin:10px auto 0;border-radius:3px}
+  .sec-h .hint{font-size:15px;color:var(--ink);max-width:720px}
   .card{background:var(--paper);border:0;border-radius:16px;box-shadow:var(--frame)}
 
   /* 總覽 */
@@ -309,6 +311,7 @@
       <label>數量<input id="i-qty" type="number" min="0" step="1" placeholder="可先空著"></label>
       <label>場次<select id="i-scene"><option>戶外</option><option>餐會</option><option>共用</option></select></label>
     </div>
+    <label>相關工作<select id="i-task"></select></label>
     <div class="two">
       <label>需要日期<input id="i-need" type="date"></label>
       <label class="chk" style="margin-top:26px"><input id="i-design" type="checkbox"> 要請設計組做</label>
@@ -693,6 +696,12 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     if(!demo) return jsonp({ action:'itemDelete', id:it.id, by:it.by });
     state.items=state.items.filter(function(x){ return x.id!==it.id; }); return demoItems();
   }
+  // 物品表單的相關工作：換掉原本第一個，其他（從工作那邊連的）保留
+  function pickTasks(){
+    var orig=editingItem?idList(editingItem.tasks):[], first=orig[0]||'', sel=$('i-task').value;
+    if(sel===first) return orig.join('、');
+    return (sel?[sel]:[]).concat(orig.filter(function(x){ return x!==first && x!==sel; })).join('、');
+  }
   function openItemDlg(it){
     editingItem=it||null;
     $('itemDlgTitle').textContent = it?'修改物品':'新增物品';
@@ -701,6 +710,9 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     $('i-scene').value=it?(it.scene||'戶外'):(itemScene||'戶外');
     $('i-need').value=it&&it.need?iso(toDate(it.need)):''; $('i-design').checked=!!(it&&it.design==='要');
     $('i-note').value=it?(it.note||''):'';
+    var cur=it?idList(it.tasks)[0]||'':'';
+    $('i-task').innerHTML='<option value="">不指定</option>'+state.tasks.map(function(t){ return '<option value="'+esc(t.id)+'">'+esc(t.name)+'</option>'; }).join('');
+    $('i-task').value=cur;
     $('i-msg').innerHTML=''; $('itemSave').disabled=false; $('itemDelete').disabled=false;
     $('itemDlg').showModal();
   }
@@ -719,7 +731,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var name=$('i-name').value.trim(); if(!name){ msg.innerHTML='<span class="err">請填物品名稱</span>'; return; }
     var n=new Date();
     var it={ id:editingItem?editingItem.id:'', name:name, qty:$('i-qty').value===''?'':Number($('i-qty').value), scene:$('i-scene').value, use:editingItem?(editingItem.use||''):'',
-      design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me, tasks:editingItem?(editingItem.tasks||''):'', src:editingItem?(editingItem.src||''):'',
+      design:$('i-design').checked?'要':'', need:$('i-need').value, note:$('i-note').value.trim(), by:me, tasks:pickTasks(), src:editingItem?(editingItem.src||''):'',
       at:n.getFullYear()+'-'+pad(n.getMonth()+1)+'-'+pad(n.getDate())+' '+pad(n.getHours())+':'+pad(n.getMinutes()) };
     msg.innerHTML='<span class="saving">儲存中…</span>'; $('itemSave').disabled=true;
     pushItem(it).then(itemDone).catch(function(err){ msg.innerHTML='<span class="err">'+esc(err.message)+'</span>'; $('itemSave').disabled=false; });
