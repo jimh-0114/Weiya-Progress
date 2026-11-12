@@ -451,7 +451,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     ls('tasks', JSON.stringify(state.tasks.map(plain)));
     return Promise.resolve({ ok:true, tasks: state.tasks.map(plain), roles: state.roles, serverTime:'展示模式' });
   }
-  function fetchAll(){ return demo ? loadLocal() : jsonp({ action:'list' }); }
+  function fetchAll(fresh){ return demo ? loadLocal() : jsonp(fresh ? { action:'list', fresh:1 } : { action:'list' }); }
   function pushUpdate(t){ return demo ? demoResp() : jsonp({ action:'update', id:t.id, status:t.status, pct:t.pct, note:t.note, hours:t.hours==null?'':t.hours, by:t.by, start:iso(t.startD), end:iso(t.endD) }); }
   function pushEdit(t){ return demo ? demoResp() : jsonp({ action:'edit', id:t.id, name:t.name, detail:t.detail, output:t.output, role:t.role, hours:t.hours==null?'':t.hours, start:iso(t.startD), end:iso(t.endD), by:t.by }); }
   function pushAdd(t){
@@ -802,14 +802,23 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     renderOverview(); renderRoles(); renderGantt();
     document.querySelectorAll('.filters .chip[data-role]').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
   }
-  function load(){
-    $('mode').textContent='載入中…';
-    fetchAll().then(function(res){
-      state.roles = res.roles||[]; setTasks(res.tasks); setItems(res.items); if(demo) state.tasks.forEach(function(t){ t.person=personsForTask(t); }); state.serverTime = res.serverTime||''; renderAll();
+  function applyData(res){
+    state.roles = res.roles||[]; setTasks(res.tasks); setItems(res.items); if(demo) state.tasks.forEach(function(t){ t.person=personsForTask(t); }); state.serverTime = res.serverTime||''; renderAll();
+  }
+  // 打開時先顯示這台電腦上次存的資料，背景再抓新的；按「重新整理」一定抓最新
+  function load(fresh){
+    var shown=false;
+    if(!demo && !fresh){
+      try{ var c=JSON.parse(ls('snap')||'null'); if(c && c.tasks){ applyData(c); shown=true; $('mode').textContent='更新中…'; } }catch(e){}
+    }
+    if(!shown) $('mode').textContent='載入中…';
+    fetchAll(fresh).then(function(res){
+      if(!demo) ls('snap', JSON.stringify(res));
+      applyData(res);
     }).catch(function(err){
       $('mode').textContent='連線失敗'; $('mode').className='badge demo';
-      $('notice').className='notice on'; $('notice').textContent='無法連到試算表後台：'+err.message+'。請稍後按「重新整理」再試。以下先顯示檔案內的資料。';
-      if(SEED && !state.tasks.length){ setTasks(SEED.tasks); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); renderItems(); }
+      $('notice').className='notice on'; $('notice').textContent=(shown?'目前顯示的是上次的資料，':'')+'無法連到試算表後台：'+err.message+'。請稍後按「重新整理」再試。'+(shown?'':'以下先顯示檔案內的資料。');
+      if(!shown && SEED && !state.tasks.length){ setTasks(SEED.tasks); state.roles = SEED.roles; renderOverview(); renderRoles(); renderRows(); renderGantt(); renderItems(); }
     });
   }
 
@@ -825,7 +834,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var g=e.target.closest('[data-go]'); if(g){ filterRole=g.dataset.go; renderAll(); showPage('tasks'); }
   });
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
-  $('reload').addEventListener('click', load);
+  $('reload').addEventListener('click', function(){ load(true); });
   (function(){
     var tip=$('gtip'), g=$('gantt');
     function move(e){ var x=e.clientX+14, y=e.clientY+16; var r=tip.getBoundingClientRect(); if(x+r.width>window.innerWidth-8) x=e.clientX-r.width-14; if(y+r.height>window.innerHeight-8) y=e.clientY-r.height-12; tip.style.left=x+'px'; tip.style.top=y+'px'; }
