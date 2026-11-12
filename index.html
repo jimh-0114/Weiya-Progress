@@ -197,7 +197,8 @@
   #itemTable{min-width:1000px}
   #itemTable td{text-align:center}
   #itemTable td:first-child{text-align:left}
-  #itemTable td.inote{text-align:center;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap}
+  #itemTable td.inote{text-align:center;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  #itemTable td.inote a{color:var(--blue,#0076ac);text-decoration:underline}
   .dz{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13.5px;background:#FDE2E0;color:#B53A4A;font-weight:500;white-space:nowrap}
   .isum{text-align:center;font-size:14.5px;color:var(--ink-2);margin:-6px 0 14px}
   dialog .frm label.chk{display:flex;gap:8px;align-items:center;font-size:15px;color:var(--ink);cursor:pointer}
@@ -418,6 +419,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function fmtFull(x){ return x ? x.getFullYear()+'/'+(x.getMonth()+1)+'/'+x.getDate()+'（'+'日一二三四五六'[x.getDay()]+'）' : '—'; }
   function iso(x){ return x ? x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate()) : ''; }
   function pad(n){ return (n<10?'0':'')+n; }
+  function linkNote(s){ return esc(s).replace(/https?:\/\/[^\s<]+/g, function(u){ var h=u.replace(/^https?:\/\//,''); var show=h.length>28 ? h.split(/[\/?#]/)[0]+'/…' : h; return '<a href="'+u+'" target="_blank" rel="noopener">'+show+'</a>'; }); }
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
   // ── 資料層 ──
@@ -686,7 +688,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td>'
         +'<td class="itask">'+(taskNames(it.tasks).map(esc).join('<br>')||'—')+'</td>'
         +'<td>'+(it.design==='要'?'<span class="dz">要做</span>'+(it.spec?'<div class="ispec">'+esc(specShort(it.spec))+'</div>':''):'—')+'</td>'
-        +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+esc(it.note)+'</td>'
+        +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+linkNote(it.note)+'</td>'
         +'<td><div class="by">'+(it.by?esc(it.by)+'<br>'+esc(String(it.at||'').slice(5,16)):'—')+'</div></td>';
       tr.querySelector('.edit').addEventListener('click', function(){ openItemDlg(it); });
       tb.appendChild(tr);
