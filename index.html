@@ -198,6 +198,10 @@
   #itemTable td{text-align:center}
   #itemTable td:first-child{text-align:left}
   #itemTable td.inote{text-align:center;font-size:14px;color:var(--ink-2);line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+  #itemTable .nclip{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  #itemTable .nclip.open{display:block;-webkit-line-clamp:unset}
+  #itemTable .nmore{margin-top:4px;border:0;background:none;color:var(--blue,#0076ac);font-size:13px;cursor:pointer;padding:2px 6px}
+  #itemTable .nmore:hover{text-decoration:underline}
   #itemTable td.inote a{color:var(--blue,#0076ac);text-decoration:underline}
   .dz{display:inline-block;padding:2px 12px;border-radius:99px;font-size:13.5px;background:#FDE2E0;color:#B53A4A;font-weight:500;white-space:nowrap}
   .isum{text-align:center;font-size:14.5px;color:var(--ink-2);margin:-6px 0 14px}
@@ -688,13 +692,30 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
         +'<td>'+esc(it.qty)+'</td><td>'+esc(it.scene)+'</td>'
         +'<td class="itask">'+(taskNames(it.tasks).map(esc).join('<br>')||'—')+'</td>'
         +'<td>'+(it.design==='要'?'<span class="dz">要做</span>'+(it.spec?'<div class="ispec">'+esc(specShort(it.spec))+'</div>':''):'—')+'</td>'
-        +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote">'+linkNote(it.note)+'</td>'
+        +'<td>'+(it.need?fmt(toDate(it.need)):'—')+'</td><td class="inote"><div class="nclip'+(openNotes[it.id]?' open':'')+'">'+linkNote(String(it.note||'').trim())+'</div><button class="nmore" type="button" hidden>'+(openNotes[it.id]?'▲ 收起':'▼ 展開')+'</button></td>'
         +'<td><div class="by">'+(it.by?esc(it.by)+'<br>'+esc(String(it.at||'').slice(5,16)):'—')+'</div></td>';
       tr.querySelector('.edit').addEventListener('click', function(){ openItemDlg(it); });
+      tr.querySelector('.nmore').addEventListener('click', function(){
+        openNotes[it.id]=!openNotes[it.id];
+        this.previousElementSibling.classList.toggle('open', !!openNotes[it.id]);
+        this.textContent=openNotes[it.id]?'▲ 收起':'▼ 展開';
+      });
       tb.appendChild(tr);
     });
+    fitNotes();
     if(!tb.children.length) tb.innerHTML='<tr><td colspan="8" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
   }
+  // 備註超過兩行才出現「展開」（物品分頁沒顯示時量不到，切過去再量）
+  var openNotes={};
+  function fitNotes(){
+    document.querySelectorAll('#irows .nclip').forEach(function(d){
+      if(!d.offsetParent) return;
+      var btn=d.nextElementSibling, was=d.classList.contains('open');
+      d.classList.remove('open'); var over=d.scrollHeight>d.clientHeight+2; if(was) d.classList.add('open');
+      btn.hidden=!over;
+    });
+  }
+  window.addEventListener('resize', fitNotes);
   function idList(s){ return String(s||'').split(/[、,，\s]+/).filter(Boolean); }
   function taskNames(s){ return idList(s).map(function(id){ var t=state.tasks.filter(function(x){ return x.id===id; })[0]; return t?t.name:''; }).filter(Boolean); }
   function itemsOfTask(id){ return (state.items||[]).filter(function(x){ return idList(x.tasks).indexOf(id)>=0; }); }
@@ -826,7 +847,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function showPage(p){
     document.querySelectorAll('.page').forEach(function(s){ s.classList.toggle('on', s.id==='page-'+p); });
     document.querySelectorAll('#tabs button').forEach(function(b){ b.classList.toggle('on', b.dataset.page===p); });
-    ls('page', p); window.scrollTo(0,0);
+    ls('page', p); window.scrollTo(0,0); if(p==='items') fitNotes();
   }
   $('tabs').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) showPage(b.dataset.page); });
   document.addEventListener('click', function(e){
