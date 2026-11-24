@@ -228,10 +228,6 @@
   .money .tile b{font-size:30px}
   .money .tile.left b{color:var(--green)}.money .tile.over b{color:var(--s-late)}
   .money .tile .edit-b{font-size:12.5px;margin-top:6px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:1px 10px;cursor:pointer;color:var(--ink-2)}
-  .gsum{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px}
-  .gsum button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:6px 14px;cursor:pointer;font-size:14.5px;line-height:1.4}
-  .gsum button small{display:block;font-size:12.5px;color:var(--ink-2)}
-  .gsum button.on{background:var(--red);color:#fff;border-color:var(--red)}.gsum button.on small{color:#dfeef7}
   .to{display:inline-block;margin:2px;padding:1px 10px;border-radius:99px;font-size:13px;background:#E7F2F9;color:var(--red-dk);white-space:nowrap}
   .to.設計組{background:#FDE2E0;color:#B53A4A}.to.採購組{background:#E1F1E6;color:#2f7a52}.to.自己做{background:#F1EEE6;color:var(--ink-2)}
   #itemTable .money-c{font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -330,7 +326,6 @@
       <div class="tile"><b id="m-spend">0</b><span>預計花費（<span id="m-priced">0</span> 項有填金額）</span></div>
       <div class="tile left" id="m-leftTile"><b id="m-left">0</b><span id="m-leftLbl">還剩</span></div>
     </div>
-    <div class="gsum" id="gsum"></div>
     <div class="filters" id="ifilters">
       <button class="chip on" data-scene="">全部場次</button>
       <button class="chip" data-scene="戶外">戶外</button>
@@ -727,26 +722,16 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       return String(a.id).localeCompare(String(b.id));
     });
   }
-  var itemTo='';
   function spendOf(){ return (state.items||[]).reduce(function(a,x){ return a+(priceOf(x)||0); },0); }
   function renderItems(){
     var all=state.items||[];
     var sp=spendOf(), left=budget-sp, priced=all.filter(function(x){ return priceOf(x)!=null; }).length;
     $('m-budget').textContent=money(budget); $('m-spend').textContent=money(sp); $('m-priced').textContent=priced+' / '+all.length;
     $('m-left').textContent=money(Math.abs(left)); $('m-leftLbl').textContent=left>=0?'還剩':'超出預算'; $('m-leftTile').className='tile '+(left>=0?'left':'over');
-    // 各組小計（一項交給多組時，每組都列，但金額只算一次在總數）
-    var gs=[''].concat(GROUPS), none=all.filter(function(x){ return !toList(x).length; });
-    $('gsum').innerHTML=gs.map(function(g){
-      var list = g ? all.filter(function(x){ return toList(x).indexOf(g)>=0; }) : all;
-      if(g && !list.length) return '';
-      var amt=list.reduce(function(a,x){ return a+(priceOf(x)||0); },0);
-      return '<button type="button" data-to="'+esc(g)+'" class="'+(itemTo===g?'on':'')+'">'+(g||'全部')+' '+list.length+' 項<small>'+(amt?'$'+money(amt):'—')+'</small></button>';
-    }).join('')+(none.length?'<button type="button" data-to="__none" class="'+(itemTo==='__none'?'on':'')+'">還沒指定 '+none.length+' 項<small>—</small></button>':'');
     document.querySelectorAll('#ifilters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.scene||'')===itemScene); });
     var tb=$('irows'); tb.innerHTML='';
     all.forEach(function(it){
       if(itemScene && it.scene!==itemScene) return;
-      if(itemTo==='__none' ? toList(it).length : (itemTo && toList(it).indexOf(itemTo)<0)) return;
       var pr=priceOf(it), tos=toList(it);
       var tr=document.createElement('tr');
       tr.innerHTML='<td><div class="name">'+esc(it.name)+'<span class="scene">'+esc(it.scene||'')+'</span></div><button class="edit" type="button">修改</button></td>'
@@ -765,7 +750,6 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     fitNotes();
     if(!tb.children.length) tb.innerHTML='<tr><td colspan="7" class="empty" style="text-align:center;padding:28px">'+(all.length?'沒有符合的物品':'還沒有物品，按「＋ 新增物品」開始填')+'</td></tr>';
   }
-  $('gsum').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b){ itemTo=b.dataset.to||''; renderItems(); } });
   $('budgetEdit').addEventListener('click', function(){
     var v=prompt('活動經費（元，活動獎金不算在內）', budget); if(v==null) return;
     v=Number(String(v).replace(/[,\s]/g,'')); if(!(v>=0)){ alert('請填數字'); return; }
