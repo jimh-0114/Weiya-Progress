@@ -300,8 +300,6 @@
   <section class="page" id="page-tasks">
     <div class="sec-h"><h2>填進度</h2><span class="hint">點狀態就存檔；要改日期、時數、備註，點工作名稱展開</span></div>
     <div class="filters" id="filters">
-      <button class="chip on" data-role="__me">我的工作</button>
-      <button class="chip" data-role="">全部</button>
       <span class="sp"></span>
       <label><input type="checkbox" id="hideDone" checked> 隱藏已完成</label>
       <button class="btn primary" id="addTask">＋ 新增工作</button>
@@ -418,11 +416,11 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   var GROUPS = ['自己做','採購組','設計組','場佈音效組','影像組','行政組','企劃組'];
   var budget = 50000;
   var state = { tasks: [], roles: [], items: [], serverTime: '' };
-  var filterRole = '__me', hideDone = true, showMore = false;
+  var filterRole = '', taskRole = '', hideDone = true, showMore = false;   // taskRole：填進度選的位子（只有五個位子）
   var EVENT = new Date(2027, 0, 15), T0 = new Date(2026, 8, 22), T1 = new Date(2027, 1, 6);
   var $ = function(id){ return document.getElementById(id); };
   var meInput = $('me');
-  meInput.addEventListener('change', function(){ ls('me', meInput.value.trim()); filterRole = meInput.value ? '__me' : ''; renderAll(); });
+  meInput.addEventListener('change', function(){ ls('me', meInput.value.trim()); renderAll(); });
   function fillPeople(){
     var names=[]; state.roles.forEach(function(r){ splitNames(r.person).forEach(function(n){ if(names.indexOf(n)<0) names.push(n); }); });
     var cur=meInput.value || ls('me') || '';
@@ -590,7 +588,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
     var TH = totalHours(), wk = weeksLeft();
     var ratios = {}; state.roles.forEach(function(r){ ratios[r.role] = TH>0 ? roleHours(r.role)/TH : 0; });
     var maxRatio = Math.max.apply(null, state.roles.map(function(r){ return ratios[r.role]; }).concat([0.3]));
-    ['filters2'].forEach(function(fid){
+    ['filters','filters2'].forEach(function(fid){
       var f = $(fid); f.querySelectorAll('.chip[data-role]:not([data-role=""])').forEach(function(c){ c.remove(); });
       var sp = f.querySelector('.sp');
       state.roles.forEach(function(r){ var c=document.createElement('button'); c.className='chip'; c.dataset.role=r.role; c.textContent=r.role; f.insertBefore(c, sp); });
@@ -621,10 +619,11 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   function needMe(msg){ if(meInput.value) return true; meInput.focus(); meInput.style.outline='3px solid var(--gold)'; setTimeout(function(){ meInput.style.outline=''; },1500); msg.innerHTML='<span class="err">先在右上角選名字</span>'; return false; }
   function renderRows(){
     var box=$('rows'); box.innerHTML='';
-    document.querySelectorAll('#filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===filterRole); });
+    var roleNames = state.roles.map(function(r){ return r.role; });
+    if(roleNames.indexOf(taskRole)<0) taskRole = roleNames.indexOf(ls('taskRole'))>=0 ? ls('taskRole') : (roleNames[0]||'');
+    document.querySelectorAll('#filters .chip').forEach(function(c){ c.classList.toggle('on', (c.dataset.role||'')===taskRole); });
     state.tasks.forEach(function(t){
-      if(filterRole==='__me'){ if(!isMine(t)) return; }
-      else if(filterRole && !roleMatch(t, filterRole)) return;
+      if(taskRole && !roleMatch(t, taskRole)) return;
       if(hideDone && t.status==='已完成') return;
       var late=isLate(t), el=document.createElement('div');
       el.className='trow'+(late?' late':'')+(t.status==='已完成'?' done':'');
@@ -672,7 +671,7 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
       note.addEventListener('blur', function(){ if(note.value===(t.note||'')) return; if(!needMe(msg)) return; t.note=note.value; stamp(t); save(); });
       box.appendChild(el);
     });
-    if(!box.children.length) box.innerHTML='<div class="empty" style="padding:28px">'+(filterRole==='__me' && !meInput.value ? '先在右上角選你的名字，這裡就會列出你的工作' : '沒有符合的項目')+'</div>';
+    if(!box.children.length) box.innerHTML='<div class="empty" style="padding:28px">'+'沒有符合的項目'+'</div>';
   }
 
   // ── 時程 ──
@@ -909,8 +908,8 @@ var SEED = {"tasks":[{"id":"A01","name":"活動組內部分工","detail":"確認
   }
   $('tabs').addEventListener('click', function(e){ var b=e.target.closest('button'); if(b) showPage(b.dataset.page); });
   document.addEventListener('click', function(e){
-    var c=e.target.closest('.filters .chip[data-role]'); if(c){ filterRole=c.dataset.role||''; renderAll(); return; }
-    var g=e.target.closest('[data-go]'); if(g){ filterRole=g.dataset.go; renderAll(); showPage('tasks'); }
+    var c=e.target.closest('.filters .chip[data-role]'); if(c){ if(c.closest('#filters')){ taskRole=c.dataset.role; ls('taskRole', taskRole); renderRows(); } else { filterRole=c.dataset.role||''; renderAll(); } return; }
+    var g=e.target.closest('[data-go]'); if(g){ taskRole=g.dataset.go; ls('taskRole', taskRole); renderAll(); showPage('tasks'); }
   });
   $('hideDone').addEventListener('change', function(){ hideDone=this.checked; renderRows(); });
   $('reload').addEventListener('click', function(){ load(true); });
